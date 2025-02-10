@@ -33,6 +33,14 @@ void fillTable() {
     table[START]['\n'] = ACCEPT;
     table[INIT]['\n'] = ACCEPT;
 
+    // Task 2.4: Add support for labels in the beginning og lines
+    for (char c = '0'; c <= '9'; c++)
+    {
+        table[START][c] = 10;
+        table[10][c] = 10;
+    }
+    table[10][':'] = INIT;
+
     // Accept the statement "go"
     table[START]['g'] = 2;
     table[INIT]['g'] = 2;
@@ -59,9 +67,6 @@ void fillTable() {
     for (char c = '0'; c <= '9'; c++)
     {
         table[7][c] = 9;
-    }
-    for (char c = '0'; c <= '9'; c++)
-    {
         table[9][c] = 9;
     }
 
