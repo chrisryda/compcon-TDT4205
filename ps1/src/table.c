@@ -37,5 +37,5 @@ void fillTable() {
 
     // TODO Expand the table to pass (and fail) the described syntax
     // table[...][...] = ...
-
+    table[2][' '] = START;
 }
