@@ -37,5 +37,29 @@ void fillTable() {
 
     // TODO Expand the table to pass (and fail) the described syntax
     // table[...][...] = ...
-    table[2][' '] = START;
+
+    // Task 2.2: Allow spaces between valid statements
+    table[2][' '] = START; 
+
+    // Taks 2.3: Add support for statements 
+    // 'dx=<number>' and 'dy=<number>' 
+    table[START]['d'] = 3;
+    table[3]['x'] = 4;
+    table[3]['y'] = 5;
+    table[4]['='] = 6;
+    table[5]['='] = 6;
+    table[6]['-'] = 8;
+
+    for (char c = '0'; c <= '9'; c++)
+    {
+        table[6][c] = 8;
+    }
+    for (char c = '0'; c <= '9'; c++)
+    {
+        table[8][c] = 8;
+    }
+
+    table[8][' '] = START;
+    table[8]['\n'] = ACCEPT;
+
 }
