@@ -5,6 +5,8 @@
 // The starting state, at the beginning of each line
 #define START 0
 
+#define INIT 1
+
 // The state to go to after a valid line
 // All lines end with the newline character '\n'
 #define ACCEPT 12
@@ -25,41 +27,45 @@ void fillTable() {
 
     // Skip whitespace
     table[START][' '] = START;
+    table[INIT][' '] = INIT;
 
     // If we reach a newline, and are not in the middle of a statement, accept
     table[START]['\n'] = ACCEPT;
+    table[INIT]['\n'] = ACCEPT;
 
     // Accept the statement "go"
-    table[START]['g'] = 1;
-    table[1]['o'] = 2;
-    table[2]['\n'] = ACCEPT;
+    table[START]['g'] = 2;
+    table[INIT]['g'] = 2;
+    table[2]['o'] = 3;
+    table[3]['\n'] = ACCEPT;
 
 
     // TODO Expand the table to pass (and fail) the described syntax
     // table[...][...] = ...
 
     // Task 2.2: Allow spaces between valid statements
-    table[2][' '] = START; 
+    table[3][' '] = INIT; 
 
     // Taks 2.3: Add support for statements 
     // 'dx=<number>' and 'dy=<number>' 
-    table[START]['d'] = 3;
-    table[3]['x'] = 4;
-    table[3]['y'] = 5;
-    table[4]['='] = 6;
-    table[5]['='] = 6;
-    table[6]['-'] = 8;
+    table[START]['d'] = 4;
+    table[INIT]['d'] = 4;
+    table[4]['x'] = 5;
+    table[4]['y'] = 6;
+    table[5]['='] = 7;
+    table[6]['='] = 7;
+    table[7]['-'] = 9;
 
     for (char c = '0'; c <= '9'; c++)
     {
-        table[6][c] = 8;
+        table[7][c] = 9;
     }
     for (char c = '0'; c <= '9'; c++)
     {
-        table[8][c] = 8;
+        table[9][c] = 9;
     }
 
-    table[8][' '] = START;
-    table[8]['\n'] = ACCEPT;
+    table[9][' '] = INIT;
+    table[9]['\n'] = ACCEPT;
 
 }
