@@ -1,6 +1,6 @@
 
 // The number of states in your table
-#define NSTATES 14
+#define NSTATES 15
 
 // The starting state, at the beginning of each line
 #define START 0
@@ -19,7 +19,7 @@ int table[NSTATES][256];
 void fillTable() {
 
     // Make all states lead to ERROR by default
-    for (int i = 0; i < NSTATES; i++) {
+    for (int i = 0; i < (NSTATES-1); i++) {
         for (int c = 0; c < 256; c++) {
             table[i][c] = ERROR;
         }
@@ -32,6 +32,16 @@ void fillTable() {
     // If we reach a newline, and are not in the middle of a statement, accept
     table[START]['\n'] = ACCEPT;
     table[INIT]['\n'] = ACCEPT;
+
+    // Task 2.5: Add support for comments
+    table[START]['/'] = 11;
+    table[INIT]['/'] = 11;
+    table[11]['/'] = 14;
+    for (int c = 0; c < 256; c++) 
+    {
+            table[14][c] = 14;
+    }
+    table[14]['\n'] = ACCEPT;
 
     // Task 2.4: Add support for labels in the beginning og lines
     for (char c = '0'; c <= '9'; c++)
