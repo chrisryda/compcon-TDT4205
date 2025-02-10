@@ -1,6 +1,6 @@
 
 // The number of states in your table
-#define NSTATES 15
+#define NSTATES 14
 
 // The starting state, at the beginning of each line
 #define START 0
@@ -19,7 +19,7 @@ int table[NSTATES][256];
 void fillTable() {
 
     // Make all states lead to ERROR by default
-    for (int i = 0; i < (NSTATES-1); i++) {
+    for (int i = 0; i < NSTATES; i++) {
         for (int c = 0; c < 256; c++) {
             table[i][c] = ERROR;
         }
@@ -34,22 +34,22 @@ void fillTable() {
     table[INIT]['\n'] = ACCEPT;
 
     // Task 2.5: Add support for comments
-    table[START]['/'] = 11;
-    table[INIT]['/'] = 11;
-    table[11]['/'] = 14;
+    table[START]['/'] = 10;
+    table[INIT]['/'] = 10;
+    table[10]['/'] = 11;
     for (int c = 0; c < 256; c++) 
     {
-            table[14][c] = 14;
+            table[11][c] = 11;
     }
-    table[14]['\n'] = ACCEPT;
+    table[11]['\n'] = ACCEPT;
 
     // Task 2.4: Add support for labels in the beginning og lines
     for (char c = '0'; c <= '9'; c++)
     {
-        table[START][c] = 10;
-        table[10][c] = 10;
+        table[START][c] = 9;
+        table[9][c] = 9;
     }
-    table[10][':'] = INIT;
+    table[9][':'] = INIT;
 
     // Accept the statement "go"
     table[START]['g'] = 2;
@@ -69,18 +69,17 @@ void fillTable() {
     table[START]['d'] = 4;
     table[INIT]['d'] = 4;
     table[4]['x'] = 5;
-    table[4]['y'] = 6;
-    table[5]['='] = 7;
-    table[6]['='] = 7;
-    table[7]['-'] = 9;
+    table[4]['y'] = 5;
+    table[5]['='] = 6;
+    table[6]['-'] = 7;
 
     for (char c = '0'; c <= '9'; c++)
     {
-        table[7][c] = 9;
-        table[9][c] = 9;
+        table[6][c] = 7;
+        table[7][c] = 7;
     }
 
-    table[9][' '] = INIT;
-    table[9]['\n'] = ACCEPT;
+    table[7][' '] = INIT;
+    table[7]['\n'] = ACCEPT;
 
 }
