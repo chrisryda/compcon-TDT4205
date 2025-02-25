@@ -136,6 +136,9 @@ static void node_finalize(node_t* discard)
    * Finally free the memory occupied by the node itself.
    * Only free the memory owned by this node - do not touch its children.
    */
+
+  if (discard == NULL) { return; }
+
   switch (discard->type)
   {
   case IDENTIFIER:
@@ -163,6 +166,13 @@ static void destroy_subtree(node_t* discard)
    * It's a good idead to destory the children first.
    * Seems like you can use the `node_finalize` function in some way here...
    */
+  if (discard == NULL) { return; }
+
+  for (size_t i = 0; i < discard->n_children; i++)
+  {
+    destroy_subtree(discard->children[i]);
+  }
+  node_finalize(discard);
 }
 
 // Definition of the global string array NODE_TYPE_NAMES
