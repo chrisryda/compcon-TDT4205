@@ -12,14 +12,30 @@
 %option array
 %option yylineno
 
-WHITESPACE [ \t]
+WHITESPACE [ \t\n\r\v]
 COMMENT \/\/[^\n]+
 QUOTED \"([^\"\n]|\\\")*\"
+NUMBER [0-9]+
+IDENTIFIER [A-Za-z_][A-Za-z0-9_]*
 
 %%
 {WHITESPACE}+           { /* Eliminate whitespace */ }
 {COMMENT}               { /* Eliminate comments */ }
 {QUOTED}                { return STRING_TOKEN; }
+
+func                    { return FUNC; }
+var                     { return VAR; }
+return                  { return RETURN; }
+print                   { return PRINT; }
+if                      { return IF; }
+then                    { return THEN; }
+else                    { return ELSE; }
+while                   { return WHILE; }
+do                      { return DO; }
+break                   { return BREAK; }
+
+{NUMBER}                { return NUMBER_TOKEN; }
+{IDENTIFIER}            { return IDENTIFIER_TOKEN; }
 
 /*
  * TODO:
