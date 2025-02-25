@@ -38,6 +38,24 @@ node_t* node_create(node_type_t type, size_t n_children, ...)
    * Remember to *allocate* space to hold the list of children children.
    * To access the parameters passed as ..., look up "C varargs"
    */
+  
+  node_t** children = malloc(sizeof(node_t) * n_children); 
+  va_list child_list;
+  va_start(child_list, n_children);
+  for (size_t i = 0; i < n_children; i++)
+  {
+    children[i] = va_arg(child_list, node_t*);
+  }
+  va_end(child_list);
+
+  node_t* n = malloc(sizeof(node_t));
+  *n = (node_t) {
+	.type = type,
+	.children = children,
+	.n_children = n_children
+  };
+
+  return n;
 }
 
 // Append an element to the given LIST node, returns the list node
