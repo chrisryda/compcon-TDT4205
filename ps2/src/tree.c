@@ -136,6 +136,19 @@ static void node_finalize(node_t* discard)
    * Finally free the memory occupied by the node itself.
    * Only free the memory owned by this node - do not touch its children.
    */
+  switch (discard->type)
+  {
+  case IDENTIFIER:
+    free(discard->data.identifier);
+    break;
+  case STRING_LITERAL:
+    free(discard->data.string_literal);
+    break;
+  default:
+	  break;
+  }
+  free(discard->children);
+  free(discard);
 }
 
 // Recursively frees the memory owned by the given node, and all its children
