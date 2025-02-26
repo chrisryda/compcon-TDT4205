@@ -12,25 +12,23 @@ static void destroy_subtree(node_t* discard);
 // Initialize a node with the given type and children
 node_t* node_create(node_type_t type, size_t n_children, ...)
 {
-  node_t* result = malloc(sizeof(node_t));
-
-  // Initialize every field in the struct
-  *result = (node_t){
-      .type = type,
-      .n_children = n_children,
-      .children = malloc(n_children * sizeof(node_t*)),
-  };
-
-  // Read each child node from the va_list
+  node_t** children = malloc(sizeof(node_t) * n_children); 
   va_list child_list;
   va_start(child_list, n_children);
   for (size_t i = 0; i < n_children; i++)
   {
-    result->children[i] = va_arg(child_list, node_t*);
+    children[i] = va_arg(child_list, node_t*);
   }
   va_end(child_list);
 
-  return result;
+  node_t* n = malloc(sizeof(node_t));
+  *n = (node_t) {
+	.type = type,
+	.children = children,
+	.n_children = n_children
+  };
+
+  return n;
 }
 
 // Append an element to the given LIST node, returns the list node
@@ -351,11 +349,12 @@ static void node_finalize(node_t* discard)
 // Recursively frees the memory owned by the given node, and all its children
 static void destroy_subtree(node_t* discard)
 {
-  if (discard == NULL)
-    return;
+  if (discard == NULL) { return; }
 
   for (size_t i = 0; i < discard->n_children; i++)
+  {
     destroy_subtree(discard->children[i]);
+  }
   node_finalize(discard);
 }
 
