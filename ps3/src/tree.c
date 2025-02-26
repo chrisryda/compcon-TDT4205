@@ -158,27 +158,91 @@ static node_t* constant_fold_operator(node_t* node)
 {
   assert(node->type == OPERATOR);
 
-  /*
-   * TODO: 2.2 Implement constant folding of OPERATOR nodes.
-   *
-   * This is the most classic form of constant folding.
-   * When all operands of an operator are know at compile time, such as 4 + 20,
-   * the calculation can be performed at compile time, and the whole expression can be replaced
-   * by 24.
-   *
-   * In our compiler, a value is known at compile time if it is a NUMBER_LITERAL node.
-   * If all children of an OPERATOR node have this type, we can perform the operation on the
-   * numbers. The OPERATOR node can then be replaced with a NUMBER_LITERAL node holding the result
-   * as its data.
-   *
-   * Remember:
-   *  - the values of NUMBER_LITERALs are stored in number_node->data.number_literal.
-   *  - the operator of an OPERATOR node is stored in the field node->data.operator, and is a
-   * string.
-   *
-   * Checking if a string is equal to another string can be done using strcmp(str1, str2), which
-   * returns 0 if the strings are identical.
-   */
+  for (size_t i = 0; i < node->n_children; i++)
+  {
+    if (node->children[i]->type != NUMBER_LITERAL) { return node; }
+  }
+
+  int64_t res;
+  const char* op = node->data.operator;
+  
+  if (node->n_children == 1)
+  {
+    int64_t v = node->children[0]->data.number_literal;
+    if (!strcmp(op, "-"))
+    {
+      res = -v;
+    }
+    else if (!strcmp(op, "!"))
+    {
+      res = !v;
+    }
+    else
+    {
+      assert(false && "Unknown unary operator");
+    }
+  }
+
+  else if (node->n_children == 2)
+  {
+    int64_t v1 = node->children[0]->data.number_literal;
+    int64_t v2 = node->children[1]->data.number_literal;
+     
+    if (!strcmp(op, "+"))
+    {
+      res = v1 + v2;
+    }
+    else if (!strcmp(op, "-"))
+    {
+      res = v1 - v2; 
+    }
+    else if (!strcmp(op, "*"))
+    {
+      res = v1 * v2; 
+    }
+    else if (!strcmp(op, "/"))
+    {
+      res = v1 / v2; 
+    }
+    else if (!strcmp(op, "=="))
+    {
+      res = (v1 == v2); 
+    }
+    else if (!strcmp(op, "!="))
+    {
+      res = (v1 != v2); 
+    }
+    else if (!strcmp(op, ">"))
+    {
+      res = (v1 > v2); 
+    }
+    else if (!strcmp(op, ">="))
+    {
+      res = (v1 >= v2); 
+    }
+    else if (!strcmp(op, "<"))
+    {
+      res = (v1 < v2); 
+    }
+    else if (!strcmp(op, "<="))
+    {
+      res = (v1 <= v2); 
+    }
+    else
+    {
+      assert(false && "Unknown binary operator");
+    }
+
+  }
+
+  for (size_t i = 0; i < node->n_children; i++) 
+  {
+    destroy_subtree(node->children[i]);
+  }
+
+  node->type = NUMBER_LITERAL;
+  node->data.number_literal = res;
+  node->n_children = 0;
 
   return node;
 }
@@ -240,21 +304,6 @@ static node_t* constant_fold_subtree(node_t* node)
 {
   if (node == NULL)
     return node;
-
-  /*
-   * TODO: 2.1 Implement constant folding of subtrees.
-   * This function should recursively perform constant folding on the subtree rooted at node.
-   * Constant folding works in a bottom-up manner, so handle subtrees first.
-   *
-   * Once all subtrees are handled, check if the current node is a possible candidate for contant
-   * folding. If it is, hand it over to one of the three constant_fold_X functions above.
-   *
-   * Note that this function returns the new root of the constant folded subtree.
-   * In most cases the root node is just node, but you are free to return a new node if you want to
-   * replace a subtree. Just remember that any node that becomes detached from the tree, will not be
-   * reached during regular tree cleanup. Therefore it is your responsibility to clean up any such
-   * nodes to reclaim their memory.
-  */
 
   for (size_t i = 0; i < node->n_children; i++)
   {
