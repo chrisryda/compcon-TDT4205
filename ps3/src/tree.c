@@ -254,9 +254,25 @@ static node_t* constant_fold_subtree(node_t* node)
    * replace a subtree. Just remember that any node that becomes detached from the tree, will not be
    * reached during regular tree cleanup. Therefore it is your responsibility to clean up any such
    * nodes to reclaim their memory.
-   */
+  */
 
-  return node;
+  for (size_t i = 0; i < node->n_children; i++)
+  {
+    node->children[i] = constant_fold_subtree(node->children[i]);
+  }
+
+  switch (node->type)
+  {
+  case OPERATOR:
+    return constant_fold_operator(node);
+  case IF_STATEMENT:
+    return constant_fold_if(node);
+  case WHILE_STATEMENT:
+    return constant_fold_while(node);
+  default:
+    return node;
+  }
+
 }
 
 // Operates on the statement given as node, and any sub-statements it may have.
