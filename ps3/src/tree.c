@@ -281,16 +281,19 @@ static node_t* constant_fold_while(node_t* node)
 {
   assert(node->type == WHILE_STATEMENT);
 
-  /*
-   * TODO: 2.4 Implement "constant folding" on while statements
-   *
-   * Just like with IF_STATEMENTS, the first child of a WHILE_STATEMENT is the condition.
-   *
-   * If the condition is a NUMBER_LITERAL holding a constant value 0, we know that the while is
-   * never taken, and it is safe to replace the whole WHILE_STATEMENT subtree with NULL.
-   */
+  if (node->children[0]->type != NUMBER_LITERAL) { return node; }
+  bool cond = node->children[0]->data.number_literal;
 
-  return node;
+  if (cond) 
+  {
+    return node;
+  }
+  else
+  {
+    destroy_subtree(node);
+    return NULL;
+  }
+
 }
 
 // Does constant folding on the subtreee rooted at the given node.
