@@ -253,29 +253,25 @@ static node_t* constant_fold_if(node_t* node)
 {
   assert(node->type == IF_STATEMENT);
 
-  /*
-   * TODO: 2.3 Implement "constant folding" on if statements
-   *
-   * The first child of an IF_STATEMENT node is its condition.
-   * If the condition node has type NUMBER_LITERAL, then we already know whether the if is going to
-   * be taken or not:
-   *  - 0 means not taken
-   *  - any other value means taken
-   *
-   * If we know that the if will be taken, we can remove the IF_STATEMENT from the program.
-   * Instead we return the node that contains its then-body (the IF_STATEMENT node's second child).
-   *
-   * Likewise, if the know that the if will not be taken, we can replace the entire IF_STATEMENT
-   * with its else-body. Not all IFs have an else body, so check that the IF_STATEMENT node has 3
-   * children first. If the IF_STATEMENT is never taken, but it does not have an else-body, you can
-   * return NULL.
-   *
-   * Be very careful about cleaning up any parts of the tree that are no longer used.
-   * The easiest way of doing this is to "detach" any part you want to keep,
-   * and then sending the rest of the IF_STATEMENT node to destroy_subtree.
-   */
+  if (node->children[0]->type != NUMBER_LITERAL) { return node; }
+  bool cond = node->children[0]->data.number_literal;
 
-  return node;
+  node_t* res = NULL;
+  if (cond)
+  {
+    res = node->children[1];
+    node->children[1] = NULL; 
+  }
+  else if (node->n_children == 3)
+  {
+    res = node->children[2];
+    node->children[2] = NULL;
+  }
+
+  destroy_subtree(node);
+
+  return res;
+
 }
 
 // If the condition of the given while node is a NUMBER_LITERAL, and it is false (0),
