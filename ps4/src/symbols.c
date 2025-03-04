@@ -30,6 +30,15 @@ void create_tables(void)
   // IDENTIFIERs that reference declarations should point to the symbol_t they reference.
   // It handles pushing and popping scopes, and adding variables to the local symbol table.
   // A final task performed by bind_names(...), is adding strings to the global string list.
+  find_globals();
+
+  for (size_t i = 0; i < global_symbols->n_symbols; i++)
+  {
+    symbol_t* symbol = global_symbols->symbols[i];
+    if (symbol->type != SYMBOL_FUNCTION) { continue; }
+    
+    bind_names(symbol->function_symtable, symbol->node);
+  }
 }
 
 // Prints the global symbol table, and the local symbol tables for each function.
