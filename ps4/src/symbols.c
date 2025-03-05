@@ -20,6 +20,7 @@ static void destroy_string_list(void);
 // All strings are entered into the string_list
 void create_tables(void)
 {
+  // DONE
   // TODO:
   // First use find_globals() to create the global symbol table.
   // As global symbols are added, function symbols get their own local symbol tables as well.
@@ -66,8 +67,7 @@ void destroy_tables(void)
 // When adding functions, a local symbol table with symbols for its parameters are created.
 static void find_globals(void)
 {
-  global_symbols = symbol_table_init();
-
+  // DONE
   // TODO: Create symbols for all global defintions (global variables, arrays and functions),
   // and add them to the global symbol table. See the symtype_t enum in "symbols.h"
 
@@ -81,6 +81,7 @@ static void find_globals(void)
   // If a symbol already exists with the same name, the insertion will return INSERT_COLLISION.
   // Feel free to print an error message and abort using exit(EXIT_FAILURE),
   // but we will not be testing your compiler on invalid VSL.
+  global_symbols = symbol_table_init();
 
   for (size_t i = 0; i < root->n_children; i++)
   {
@@ -88,7 +89,7 @@ static void find_globals(void)
 
     if (node->type == GLOBAL_DECLARATION)
     {
-      // Since decalrations in VSL are lists, we iterate over the children
+      // Since declarations in VSL are lists, we iterate over the children
       node_t* list = node->children[0];
       for (size_t j = 0; j < list->n_children; j++)
       {
@@ -122,15 +123,14 @@ static void find_globals(void)
       local_symbols->hashmap->backup = global_symbols->hashmap;
 
       // Create symbol for the function and add it to the global table
-      symbol_t function_symbol = (symbol_t) {
+      symbol_t* function_symbol = malloc(sizeof(symbol_t));
+      *function_symbol = (symbol_t) {
 				.name = node->children[0]->data.identifier,
 				.type = SYMBOL_FUNCTION,
 				.node = node,
 				.function_symtable = local_symbols,
 			};
-      symbol_t* function_sym = malloc(sizeof(symbol_t));
-      *function_sym = function_symbol;
-      insert_result_t insert_result = symbol_table_insert(global_symbols, function_sym);
+      insert_result_t insert_result = symbol_table_insert(global_symbols, function_symbol);
       if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
 
       // Iterate over the function paramters and add them to the local table
@@ -138,15 +138,14 @@ static void find_globals(void)
       for (size_t j = 0; j < param_list->n_children; j++)
       {
         node_t* param = param_list->children[j];
-        symbol_t param_symbol = (symbol_t) {
+        symbol_t* param_symbol = malloc(sizeof(symbol_t));
+        *param_symbol = (symbol_t) {
           .name = param->data.identifier,
           .type = SYMBOL_PARAMETER,
           .node = param,
           .function_symtable = local_symbols,
         };
-        symbol_t* param_sym = malloc(sizeof(symbol_t));
-        *param_sym = param_symbol;
-        insert_result_t insert_result = symbol_table_insert(local_symbols, param_sym);
+        insert_result_t insert_result = symbol_table_insert(local_symbols, param_symbol);
         if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
       }
     }
@@ -162,6 +161,59 @@ static void find_globals(void)
 //    Overwrites the node's data.string_list_index field with with string list index
 static void bind_names(symbol_table_t* local_symbols, node_t* node)
 {
+  symbol_hashmap_t* prev_hashmap;
+  
+  switch (node->type)
+  {
+  case FUNCTION:
+    // Avoid binding the parameters
+    bind_names(local_symbols, node->children[2]);
+    break;
+  case BLOCK:
+    // Init new hashmap for the scope of the block
+    prev_hashmap = local_symbols->hashmap;
+    local_symbols->hashmap = symbol_hashmap_init();
+    local_symbols->hashmap->backup = prev_hashmap;
+
+    if (node->n_children >= 2)
+    {
+      node_t* locals_list = node->children[0];
+      for (size_t i = 0; i < locals_list->n_children; i++)
+      {
+        node_t* locals = locals_list->children[i];
+        for (size_t j = 0; j < locals->n_children; j++)
+        {
+          node_t* local = locals->children[j];
+          symbol_t* local_symbol = malloc(sizeof(symbol_t));
+          *local_symbol = (symbol_t) {
+            .name = local->data.identifier,
+            .type = SYMBOL_LOCAL_VAR,
+            .node = local,
+            .function_symtable = NULL,
+          };
+          symbol_table_insert(local_symbols, local_symbol);
+        }
+      }
+    }
+    bind_names(local_symbols, node->children[(node->n_children - 1)]);
+
+    symbol_hashmap_destroy(local_symbols->hashmap);
+    local_symbols->hashmap = prev_hashmap;
+    break;
+  case IDENTIFIER:
+    node->symbol = symbol_hashmap_lookup(local_symbols->hashmap, node->data.identifier);
+    break;
+  case STRING_LITERAL:
+    node->data.string_list_index = add_string(node->data.string_literal);
+    node->type = STRING_LIST_REFERENCE;
+    break;
+  default:
+    for (size_t i = 0; i < node->n_children; i++)
+    {
+      bind_names(local_symbols, node->children[i]);
+    }
+    break;
+  }
   // TODO: Implement bind_names, doing all the things described above
   // Tip: See symbol_hashmap_init() in symbol_table.h, to make new hashmaps for new scopes.
   // Remember the symbol_hashmap_t's backup pointer, forming a linked list of backup hashmaps.
