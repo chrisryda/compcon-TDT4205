@@ -81,6 +81,76 @@ static void find_globals(void)
   // If a symbol already exists with the same name, the insertion will return INSERT_COLLISION.
   // Feel free to print an error message and abort using exit(EXIT_FAILURE),
   // but we will not be testing your compiler on invalid VSL.
+
+  for (size_t i = 0; i < root->n_children; i++)
+  {
+    node_t* node = root->children[i];
+
+    if (node->type == GLOBAL_DECLARATION)
+    {
+      // Since decalrations in VSL are lists, we iterate over the children
+      node_t* list = node->children[0];
+      for (size_t j = 0; j < list->n_children; j++)
+      {
+        node_t* child = list->children[j];
+        symbol_t global_symbol = (symbol_t) {
+          .node = child,
+          .function_symtable = NULL,
+        };
+
+        if (child->type == IDENTIFIER)
+        {
+          global_symbol.type = SYMBOL_GLOBAL_VAR;
+          global_symbol.name = child->data.identifier;
+        }
+        else if (child->type == ARRAY_INDEXING)
+        {
+          global_symbol.type = SYMBOL_GLOBAL_ARRAY;
+          global_symbol.name = child->children[0]->data.identifier;
+        }
+        
+        symbol_t* global_sym = malloc(sizeof(symbol_t));
+        *global_sym = global_symbol;
+        insert_result_t insert_result = symbol_table_insert(global_symbols, global_sym);
+        if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
+      }
+    }
+    else if (node->type == FUNCTION)
+    {
+      // Create local symbol table for the function
+      symbol_table_t* local_symbols = symbol_table_init();
+      local_symbols->hashmap->backup = global_symbols->hashmap;
+
+      // Create symbol for the function and add it to the global table
+      symbol_t function_symbol = (symbol_t) {
+				.name = node->children[0]->data.identifier,
+				.type = SYMBOL_FUNCTION,
+				.node = node,
+				.function_symtable = local_symbols,
+			};
+      symbol_t* function_sym = malloc(sizeof(symbol_t));
+      *function_sym = function_symbol;
+      insert_result_t insert_result = symbol_table_insert(global_symbols, function_sym);
+      if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
+
+      // Iterate over the function paramters and add them to the local table
+      node_t* param_list = node->children[1];
+      for (size_t j = 0; j < param_list->n_children; j++)
+      {
+        node_t* param = param_list->children[j];
+        symbol_t param_symbol = (symbol_t) {
+          .name = param->data.identifier,
+          .type = SYMBOL_PARAMETER,
+          .node = param,
+          .function_symtable = local_symbols,
+        };
+        symbol_t* param_sym = malloc(sizeof(symbol_t));
+        *param_sym = param_symbol;
+        insert_result_t insert_result = symbol_table_insert(local_symbols, param_sym);
+        if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
+      }
+    }
+  }
 }
 
 // A recursive function that traverses the body of a function, and:
