@@ -214,6 +214,7 @@ static void bind_names(symbol_table_t* local_symbols, node_t* node)
     }
     break;
   }
+  // DONE
   // TODO: Implement bind_names, doing all the things described above
   // Tip: See symbol_hashmap_init() in symbol_table.h, to make new hashmaps for new scopes.
   // Remember the symbol_hashmap_t's backup pointer, forming a linked list of backup hashmaps.
@@ -256,6 +257,16 @@ static void print_symbol_table(symbol_table_t* table, int nesting)
 // Frees up the memory used by the global symbol table, all local symbol tables, and their symbols
 static void destroy_symbol_tables(void)
 {
+  for (size_t i = 0; i < global_symbols->n_symbols; i++) 
+  {
+		symbol_t *symbol = global_symbols->symbols[i];
+		if (symbol->function_symtable) 
+    {
+			symbol_table_destroy(symbol->function_symtable);
+		}
+	}
+	symbol_table_destroy(global_symbols);
+  // DONE
   // TODO: Implement cleanup. All symbols in the program are owned by exactly one symbol table.
 
   // TIP: Using symbol_table_destroy() goes a long way, but it only cleans up the given table.
@@ -294,5 +305,14 @@ static void print_string_list(void)
 // Frees all strings in the global string list, and the string list itself
 static void destroy_string_list(void)
 {
+  // DONE
   // TODO: Called during cleanup, free strings, and the memory used by the string list itself
+	for (size_t i = 0; i < string_list_len; i++) 
+  {
+		free(string_list[i]);
+	}
+	free(string_list);
+	string_list = NULL;
+	string_list_len = 0;
+	string_list_capacity = 0;
 }
