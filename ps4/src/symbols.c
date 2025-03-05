@@ -282,6 +282,27 @@ static size_t string_list_capacity;
 // Takes ownership of the string, and returns its position in the string list.
 static size_t add_string(char* string)
 {
+  size_t index = string_list_len;
+
+	if (!string_list) 
+  {
+		string_list_capacity = 16;
+		string_list = malloc(sizeof(char*) * string_list_capacity);
+	}
+
+	// Resize the list when out of capacity
+	if (index >= string_list_capacity) 
+  {
+		string_list_capacity *= 2;
+		string_list = realloc(string_list, string_list_capacity);
+	}
+
+	// Set the element and update the index
+	string_list[index] = string;
+	string_list_len++;
+
+  return index;
+  // DONE
   // TODO: Write a helper function you can use during bind_names(),
   // to easily add a string into the dynamically growing string_list.
 
