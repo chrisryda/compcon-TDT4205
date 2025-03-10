@@ -177,6 +177,9 @@ static void bind_names(symbol_table_t* local_symbols, node_t* node)
       local_symbols->hashmap = symbol_hashmap_init();
       local_symbols->hashmap->backup = prev_hashmap;
 
+      // If the block is of the form '{' local_declaration_list statement_list '}'
+      // i.e. n_children is >= 2, we iterate over the local variable symbols and
+      // add them to the blocks local table 
       if (node->n_children >= 2)
       {
         node_t* locals_list = node->children[0];
@@ -193,12 +196,15 @@ static void bind_names(symbol_table_t* local_symbols, node_t* node)
               .node = local,
               .function_symtable = NULL,
             };
-            symbol_table_insert(local_symbols, local_symbol);
+            insert_result_t insert_result = symbol_table_insert(local_symbols, local_symbol);
+            if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
           }
         }
       }
+
       bind_names(local_symbols, node->children[(node->n_children - 1)]);
 
+      // Restore the hashmap
       symbol_hashmap_destroy(local_symbols->hashmap);
       local_symbols->hashmap = prev_hashmap;
       break;
