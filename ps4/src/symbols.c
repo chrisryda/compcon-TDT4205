@@ -119,8 +119,8 @@ static void find_globals(void)
     else if (node->type == FUNCTION)
     {
       // Create local symbol table for the function
-      symbol_table_t* local_symbols = symbol_table_init();
-      local_symbols->hashmap->backup = global_symbols->hashmap;
+      symbol_table_t* local_table = symbol_table_init();
+      local_table->hashmap->backup = global_symbols->hashmap;
 
       // Create symbol for the function and add it to the global table
       symbol_t* function_symbol = malloc(sizeof(symbol_t));
@@ -128,7 +128,7 @@ static void find_globals(void)
 				.name = node->children[0]->data.identifier,
 				.type = SYMBOL_FUNCTION,
 				.node = node,
-				.function_symtable = local_symbols,
+				.function_symtable = local_table,
 			};
       insert_result_t insert_result = symbol_table_insert(global_symbols, function_symbol);
       if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
@@ -143,9 +143,9 @@ static void find_globals(void)
           .name = param->data.identifier,
           .type = SYMBOL_PARAMETER,
           .node = param,
-          .function_symtable = local_symbols,
+          .function_symtable = local_table,
         };
-        insert_result_t insert_result = symbol_table_insert(local_symbols, param_symbol);
+        insert_result = symbol_table_insert(local_table, param_symbol);
         if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
       }
     }
