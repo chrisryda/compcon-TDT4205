@@ -161,6 +161,8 @@ static void find_globals(void)
 //    Overwrites the node's data.string_list_index field with with string list index
 static void bind_names(symbol_table_t* local_symbols, node_t* node)
 {
+  if (node == NULL) { return; }
+
   symbol_hashmap_t* prev_hashmap;
   
   switch (node->type)
