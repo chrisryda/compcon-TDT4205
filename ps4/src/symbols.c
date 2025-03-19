@@ -143,7 +143,7 @@ static void find_globals(void)
           .name = param->data.identifier,
           .type = SYMBOL_PARAMETER,
           .node = param,
-          .function_symtable = local_table,
+          .function_symtable = NULL,
         };
         insert_result = symbol_table_insert(local_table, param_symbol);
         if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
