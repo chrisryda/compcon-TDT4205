@@ -144,7 +144,7 @@ main:
 
     # OUTER LOOP END
     # After completing the outer loop we should be done with the table
-    row_loop_end
+    row_loop_end:
     
     movq $0, %rax
     leave
