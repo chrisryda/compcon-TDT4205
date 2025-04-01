@@ -139,18 +139,25 @@ print_padded_number:
     # TODO 1.A:
     # (Optional, recommended) 
     # Move the arguments NUMBER and PADDING to two other register to better keep track of them.
+    movq %rdi, %r8 # r8 stores NUMBER
+    movq %rsi, %r9 # r9 stores PADDING
+
 
     # TODO 1.B
     # Keep track of the amount of spaces printet for this number
     # Assign count to a register (starting at 0)
+    movq $0, %r10 # Make r10 counter initialized to 0
 
     # TODO 1.C
     # Create a loop printing PADDING spaces
     # Print Space Loop START
+    ppn_loop_start:
 
         # TODO 1.C.1
         # Check if we are done printing spaces using the count from 1.B
         # If we are done, jump out of the loop
+        cmp %r10, %r9
+        je ppn_loop_end
     
         # TODO 1.C.2
         # Print a single space
@@ -158,19 +165,32 @@ print_padded_number:
         # HOWEVER, note that if you call ANY function, you should PUSH all caller-save registers that you currently use
         # When done, POP the values in reverse order to their respective registers
         # (Hint) If using `print_space`, use `pushq` *before* the function call and `popq` afterwards
+        pushq %r8
+        pushq %r9
+        pushq %r10
+        call print_space
+        popq %r10
+        popq %r9
+        popq %r8
 
         # TODO 1.C.3
         # Incement the "number of spaces printed" counter
         # and continue the loop
+        inc %r10
+        jmp ppn_loop_start
 
     # Print Space Loop END
-        # TODO 1.C.1*
-        # Jump here from 1.C.1
+    # TODO 1.C.1*
+    # Jump here from 1.C.1
+    ppn_loop_end:
 
     # TODO 1.D
     # We are now done printing all the spaces
     # Print the number
     # (Hint) You may use the `integer_slot` here
+    leaq integer_slot(%rip), %rdi
+    movq %r8, %rsi
+    call safe_printf
 
     # Done
     leave
