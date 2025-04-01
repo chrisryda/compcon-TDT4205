@@ -56,6 +56,10 @@ static void generate_stringtable(void)
 
   // TODO 2.1: Print all strings in the program here, with labels you can refer to later
   // You have access to the global variables string_list and string_list_len from symbols.c
+  for (size_t i = 0; i < string_list_len; i++)
+  {
+    DIRECTIVE("string%ld: \t.asciz %s", i, string_list[i]); 
+  }
 }
 
 // Prints .zero entries in the .bss section to allocate room for global variables and arrays
