@@ -46,15 +46,18 @@ main:
     # Use a register to track what row we are at
     # (Recommended) Use a global register
     # (Recommended) Use 1-indexing / start at 1
+    movq $1, %r12 # r12 indicates the row, initialized to 1
 
     # TODO 2.B
     # Prepare the outer loop
     # OUTER LOOP START
+    row_loop_start:
 
         # TODO 2.C
         # Reset the register tracking what column we are at
         # (Recommended) Use a global register
         # (Recommended) Use 1-indexing / start at 1
+        movq $1, %r13 # r13 indicates the column, initialized to 1
 
         # TODO 2.D
         # Check if we are done with all rows (and thus the entire table),
@@ -62,56 +65,86 @@ main:
         # If so, move out of the loop
         # (Hint) The number of rows is stored in `n_rows` - how can we read this value?
         # (Hint) If using 1-indexing, reflect this when determining if to continue or not
-
+        movq n_rows(%rip), %r8 # Move n_rows to r8
+        inc %r8 # Because of 1-indexing
+        
+        cmp %r8, %r12
+        je row_loop_end
         # If not, we should repeat the inner loop
 
         # TODO 2.E
         # Prepare the inner loop
         # INNER LOOP START
+        col_loop_start:
 
             # TODO 2.F
             # Check if we are done with all e.g. columns and should break the loop
             # If so, move out of the inner loop
             # (Hint) See 2.D, and do respective changes
+            movq n_cols(%rip), %r8 # Move n_cols to r8
+            inc %r8 # Because of 1-indexing
+
+            cmp %r8, %r13
+            je col_loop_end
 
             # TODO 2.G
             # *Ready special registers* for our modulo check
             # Put correct values in all registers
             # (Hint) Set %rdx to 0
             # (Hint) We want to calulate M[row, col] = row % col
+            movq $0, %rdx
+            movq %r12, %rax
 
             # TODO 2.H
             # Perform the modulo math
             # (Optional, Recommended) Afterwards, move the result somewhere safe so the next functions won't accidently alter it
             # (Hint) In what register will the result appear?
+            divq %r13
+            movq %rdx, %r14
 
             # TODO 2.I
             # Get the number of digits of the result
             # (Hint) You shouldn't have to write a lot of code for this one (unless you want to)
+            movq %r14, %rdi
+            call get_digits
 
             # TODO 2.J
             # Calculate the amount of padding for the number
             # (Hint) If we allocate 3 spaces for every number, then e.g. "5" should have 2 spaces of padding
             # (Hint) You may use `subq S, D` here: "D = D - S"
+            movq space_for_numbers(%rip), %r8
+            subq %rax, %r8
 
             # TODO 2.K
             # Print the padded number using `print_padded_number` using the modulo result AND number of padding spaces
             # Afterwards, print an additional space to sepeate this number from the next
+            movq %r14, %rdi             # rdi = result
+            movq %r8, %rsi              # rsi = padding spaces (from space_for_numbers)
+            call print_padded_number    # Print the number with correct padding
+            call print_space            # Print a new space
 
             # We are now done with a single number
 
             # TODO 2.L
             # Increment the inner loop count, and repeat the loop
+            inc %r13
+            jmp col_loop_start
 
         # INNER LOOP END
+        col_loop_end:
 
             # TODO 2.M
             # First, print a newline ('\n') indicating that we are done with a row
             # Then, increment the outer loop counter
             # Finally, repeat the outer loop
+            leaq newline(%rip), %rdi
+            call safe_printf
+            inc %r12
+            jmp row_loop_start
 
     # OUTER LOOP END
-        # After completing the outer loop we should be done with the table
+    # After completing the outer loop we should be done with the table
+    row_loop_end
     
     movq $0, %rax
     leave
