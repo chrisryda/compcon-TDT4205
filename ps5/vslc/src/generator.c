@@ -108,16 +108,79 @@ static void generate_function(symbol_t* function)
 
   // TODO: 2.3.1 Do the prologue, including call frame building and parameter pushing
   // Tip: use the definitions REGISTER_PARAMS and NUM_REGISTER_PARAMS at the top of this file
+  LABEL(".%s", function->name);
+  current_function = function;
+
+  PUSHQ(RBP);
+  MOVQ(RSP, RBP);
+
+  // Up to 6 parmans from registers pushed to the stack
+  for (size_t i = 0; i < FUNC_PARAM_COUNT(function) && i < NUM_REGISTER_PARAMS; i++) 
+  {
+    PUSHQ(REGISTER_PARAMS[i]);
+  }
+
+  // Then, for each local variable, push 8-byte 0 values to the stack
+  for (size_t i = 0; i < function->function_symtable->n_symbols; i++) 
+  {
+    if (function->function_symtable->symbols[i]->type == SYMBOL_LOCAL_VAR) { PUSHQ("$0"); }
+  }
 
   // TODO: 2.4 the function body can be sent to generate_statement()
+  generate_statement(function->node->children[2]);
 
   // TODO: 2.3.2
+  LABEL(".%s.epilogue", function->name);
+  MOVQ(RBP, RSP);
+  POPQ(RBP);
+  RET;
 }
 
 // Generates code for a function call, which can either be a statement or an expression
 static void generate_function_call(node_t* call)
 {
   // TODO 2.4.3
+  symbol_t* symbol = call->children[0]->symbol;
+  if (symbol->type != SYMBOL_FUNCTION)
+  {
+    fprintf(stderr, "error: '%s' is not a function\n", symbol->name);
+    exit(EXIT_FAILURE);
+  }
+
+  node_t* argument_list = call->children[1];
+
+  size_t parameter_count = FUNC_PARAM_COUNT(symbol);
+  if (parameter_count != argument_list->n_children)
+  {
+    fprintf(
+        stderr,
+        "error: function '%s' expects '%zu' arguments, but '%zu' were given\n",
+        symbol->name,
+        parameter_count,
+        argument_list->n_children);
+    exit(EXIT_FAILURE);
+  }
+
+  // We evaluate all parameters from right to left, pushing them to the stack
+  for (int i = parameter_count - 1; i >= 0; i--)
+  {
+    generate_expression(argument_list->children[i]);
+    PUSHQ(RAX);
+  }
+
+  // Up to 6 parameters should be passed through registers instead. Pop them off the stack
+  for (size_t i = 0; i < parameter_count && i < NUM_REGISTER_PARAMS; i++)
+  {
+    POPQ(REGISTER_PARAMS[i]);
+  }
+
+  EMIT("call .%s", symbol->name);
+
+  // Now pop away any stack passed parameters still left on the stack, by moving %rsp upwards
+  if (parameter_count > NUM_REGISTER_PARAMS)
+  {
+    EMIT("addq $%zu, %s", (parameter_count - NUM_REGISTER_PARAMS) * 8, RSP);
+  }
 }
 
 // Generates code to evaluate the expression, and place the result in %rax
@@ -125,6 +188,144 @@ static void generate_expression(node_t* expression)
 {
   // TODO: 2.4.1 Generate code for evaluating the given expression.
   // (The candidates are NUMBER_LITERAL, IDENTIFIER, ARRAY_INDEXING, OPERATOR and FUNCTION_CALL)
+  switch (expression->type)
+  {
+  case NUMBER_LITERAL:
+    // Simply place the number into %rax
+    EMIT("movq $%ld, %s", expression->data.number_literal, RAX);
+    break;
+  case IDENTIFIER:
+    // Load the variable, and put the result in RAX
+    MOVQ(generate_variable_access(expression), RAX);
+    break;
+  case ARRAY_INDEXING:
+    // Load the value pointed to by array[idx], and put the result in RAX
+    MOVQ(generate_array_access(expression), RAX);
+    break;
+  case OPERATOR:
+  {
+    const char* op = expression->data.operator;
+    if (strcmp(op, "+") == 0)
+    {
+      generate_expression(expression->children[0]);
+      PUSHQ(RAX);
+      generate_expression(expression->children[1]);
+      POPQ(RCX);
+      ADDQ(RCX, RAX);
+    }
+    else if (strcmp(op, "-") == 0)
+    {
+      if (expression->n_children == 1)
+      {
+        // Unary minus
+        generate_expression(expression->children[0]);
+        NEGQ(RAX);
+      }
+      else
+      {
+        // Binary minus. Evaluate RHS first, to get the result in RAX easier
+        generate_expression(expression->children[1]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[0]);
+        POPQ(RCX);
+        SUBQ(RCX, RAX);
+      }
+    }
+    else if (strcmp(op, "*") == 0)
+    {
+      // Multiplication does not need to do sign extend
+      generate_expression(expression->children[0]);
+      PUSHQ(RAX);
+      generate_expression(expression->children[1]);
+      POPQ(RCX);
+      IMULQ(RCX, RAX);
+    }
+    else if (strcmp(op, "/") == 0)
+    {
+      generate_expression(expression->children[1]);
+      PUSHQ(RAX);
+      generate_expression(expression->children[0]);
+      CQO; // Sign extend RAX -> RDX:RAX
+      POPQ(RCX);
+      IDIVQ(RCX); // Didivde RDX:RAX by RCX, placing the result in RAX
+    }
+    else if (strcmp(op, "==") == 0)
+    {
+      generate_expression(expression->children[0]);
+      PUSHQ(RAX);
+      generate_expression(expression->children[1]);
+      POPQ(RCX);
+      CMPQ(RAX, RCX);
+      SETE(AL);        // Store lhs == rhs into %al
+      MOVZBQ(AL, RAX); // Zero extend to all of %rax
+    }
+    else if (strcmp(op, "!=") == 0)
+    {
+      generate_expression(expression->children[0]);
+      PUSHQ(RAX);
+      generate_expression(expression->children[1]);
+      POPQ(RCX);
+      CMPQ(RAX, RCX);
+      SETNE(AL);       // Store lhs != rhs into %al
+      MOVZBQ(AL, RAX); // Zero extend to all of %rax
+    }
+    else if (strcmp(op, "<") == 0)
+    {
+      generate_expression(expression->children[0]);
+      PUSHQ(RAX);
+      generate_expression(expression->children[1]);
+      POPQ(RCX);
+      CMPQ(RAX, RCX);
+      SETL(AL);        // Store lhs < rhs into %al
+      MOVZBQ(AL, RAX); // Zero extend to all of %rax
+    }
+    else if (strcmp(op, "<=") == 0)
+    {
+      generate_expression(expression->children[0]);
+      PUSHQ(RAX);
+      generate_expression(expression->children[1]);
+      POPQ(RCX);
+      CMPQ(RAX, RCX);
+      SETLE(AL);       // Store lhs <= rhs into %al
+      MOVZBQ(AL, RAX); // Zero extend to all of %rax
+    }
+    else if (strcmp(op, ">") == 0)
+    {
+      generate_expression(expression->children[0]);
+      PUSHQ(RAX);
+      generate_expression(expression->children[1]);
+      POPQ(RCX);
+      CMPQ(RAX, RCX);
+      SETG(AL);        // Store lhs > rhs into %al
+      MOVZBQ(AL, RAX); // Zero extend to all of %rax
+    }
+    else if (strcmp(op, ">=") == 0)
+    {
+      generate_expression(expression->children[0]);
+      PUSHQ(RAX);
+      generate_expression(expression->children[1]);
+      POPQ(RCX);
+      CMPQ(RAX, RCX);
+      SETGE(AL);       // Store lhs >= rhs into %al
+      MOVZBQ(AL, RAX); // Zero extend to all of %rax
+    }
+    else if (strcmp(op, "!") == 0)
+    {
+      generate_expression(expression->children[0]);
+      CMPQ("$0", RAX);
+      SETE(AL);        // Store %rax == 0 into %al
+      MOVZBQ(AL, RAX); // Zero extend to all of %rax
+    }
+    else
+      assert(false && "Unknown expression operation");
+    break;
+  }
+  case FUNCTION_CALL:
+    generate_function_call(expression);
+    break;
+  default:
+    assert(false && "Unknown expression type");
+  }
 }
 
 static void generate_assignment_statement(node_t* statement)
@@ -134,17 +335,59 @@ static void generate_assignment_statement(node_t* statement)
   // Use the IDENTIFIER's symbol to find out what kind of symbol you are assigning to.
   // The left hand side of an assignment statement may also be an ARRAY_INDEXING node.
   // In that case, you must also emit code for evaluating the index being stored to
+  node_t* dest = statement->children[0];
+  node_t* expression = statement->children[1];
+
+  // First the right hand side of the assignment is evaluated
+  generate_expression(expression);
+
+  if (dest->type == IDENTIFIER) {
+    // Store rax into the memory location corresponding to the variable
+    MOVQ(RAX, generate_variable_access(dest));
+  }
+  else
+  {
+    assert(dest->type == ARRAY_INDEXING);
+    // Store rax until the final address of the array element is found,
+    // since array index calculation can potentially modify all registers
+    PUSHQ(RAX);
+    const char* dest_mem = generate_array_access(dest);
+    POPQ(RAX);
+    MOVQ(RAX, dest_mem);
+  }
 }
 
 static void generate_print_statement(node_t* statement)
 {
   // TODO: 2.4.4
   // Remember to call safe_printf instead of printf
+  node_t* print_items = statement->children[0];
+  for (size_t i = 0; i < print_items->n_children; i++)
+  {
+    node_t* item = print_items->children[i];
+    if (item->type == STRING_LIST_REFERENCE)
+    {
+      EMIT("leaq strout(%s), %s", RIP, RDI);
+      EMIT("leaq string%zu(%s), %s", (size_t)item->data.string_list_index, RIP, RSI);
+    }
+    else
+    {
+      generate_expression(item);
+      MOVQ(RAX, RSI);
+      EMIT("leaq intout(%s), %s", RIP, RDI);
+    }
+    EMIT("call safe_printf");
+  }
+
+  MOVQ("$'\\n'", RDI);
+  EMIT("call safe_putchar");
 }
 
 static void generate_return_statement(node_t* statement)
 {
   // TODO: 2.4.5 Evaluate the return value, store it in %rax and jump to the function epilogue
+  generate_expression(statement->children[0]);
+  EMIT("jmp .%s.epilogue", current_function->name);
 }
 
 // Recursively generate the given statement node, and all sub-statements.
@@ -156,6 +399,41 @@ static void generate_statement(node_t* node)
   // TODO: 2.4 Generate instructions for statements.
   // The candidates are BLOCK, ASSIGNMENT_STATEMENT, PRINT_STATEMENT, RETURN_STATEMENT,
   // FUNCTION_CALL
+  switch (node->type)
+  {
+  case BLOCK:
+  {
+    // All handling of pushing and popping scopes has already been done
+    // Just generate the statements that make up the statement body, one by one
+    node_t* statement_list = node->children[node->n_children - 1];
+    for (size_t i = 0; i < statement_list->n_children; i++)
+      generate_statement(statement_list->children[i]);
+    break;
+  }
+  case ASSIGNMENT_STATEMENT:
+    generate_assignment_statement(node);
+    break;
+  case PRINT_STATEMENT:
+    generate_print_statement(node);
+    break;
+  case RETURN_STATEMENT:
+    generate_return_statement(node);
+    break;
+  case FUNCTION_CALL:
+    generate_function_call(node);
+    break;
+  case IF_STATEMENT:
+    generate_if_statement(node);
+    break;
+  case WHILE_STATEMENT:
+    generate_while_statement(node);
+    break;
+  case BREAK_STATEMENT:
+    generate_break_statement();
+    break;
+  default:
+    assert(false && "Unknown statement type");
+  }
 }
 
 static void generate_safe_printf(void)
