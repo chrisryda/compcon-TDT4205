@@ -442,8 +442,9 @@ static void generate_if_statement(node_t* statement)
 
   // You will need to define your own unique labels for this if statement,
   // so consider using a global variable as a counter to give each label a suffix unique to this if.
-  static int id = -1;
-  id++;
+  
+  static int next_id;
+  int id = next_id++;
 
   generate_expression(statement->children[0]);
   CMPQ("$0", RAX);
