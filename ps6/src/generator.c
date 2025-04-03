@@ -442,6 +442,27 @@ static void generate_if_statement(node_t* statement)
 
   // You will need to define your own unique labels for this if statement,
   // so consider using a global variable as a counter to give each label a suffix unique to this if.
+  static int id = -1;
+  id++;
+
+  generate_expression(statement->children[0]);
+  CMPQ("$0", RAX);
+  if (statement->n_children == 2) 
+  {
+    EMIT("je END_IF_%x", id);
+    generate_statement(statement->children[1]);
+    EMIT("jmp END_IF_%x", id);
+  }
+  else if (statement->n_children >= 3)
+  {
+    EMIT("je ELSE_IF_%x", id);
+    generate_statement(statement->children[1]);
+    EMIT("jmp END_IF_%x", id);
+    LABEL("ELSE_IF_%x", id);
+    generate_statement(statement->children[2]);
+  }
+
+  LABEL("END_IF_%x", id);
 }
 
 static void generate_while_statement(node_t* statement)
