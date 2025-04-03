@@ -471,6 +471,18 @@ static void generate_while_statement(node_t* statement)
   // TODO (2.2):
   // Implement while loops, similarily to the way if statements were generated.
   // Remember to make label names unique, and to handle nested while loops.
+  
+  static int next_id;
+  int id = next_id++;
+
+  LABEL("WHILE_%x", id);
+  generate_expression(statement->children[0]);
+  CMPQ("$0", RAX);
+  EMIT("je END_WHILE_%x", id);
+  generate_statement(statement->children[1]);
+  EMIT("jmp WHILE_%x", id);
+
+  LABEL("END_WHILE_%x", id);
 }
 
 // Leaves the currently innermost while loop using its end-label
