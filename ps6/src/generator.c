@@ -466,14 +466,21 @@ static void generate_if_statement(node_t* statement)
   LABEL("END_IF_%x", id);
 }
 
+static char current_end_loop_label[32];
+
 static void generate_while_statement(node_t* statement)
 {
   // TODO (2.2):
   // Implement while loops, similarily to the way if statements were generated.
   // Remember to make label names unique, and to handle nested while loops.
   
+  char prev_end_loop_label[32];
+  memcpy(prev_end_loop_label, current_end_loop_label, 32);
+  char end_label[32];
   static int next_id;
   int id = next_id++;
+  sprintf(end_label, "END_WHILE_%x", id);
+  memcpy(current_end_loop_label, end_label, 32);
 
   LABEL("WHILE_%x", id);
   generate_expression(statement->children[0]);
@@ -483,6 +490,7 @@ static void generate_while_statement(node_t* statement)
   EMIT("jmp WHILE_%x", id);
 
   LABEL("END_WHILE_%x", id);
+  memcpy(current_end_loop_label, prev_end_loop_label, 32);
 }
 
 // Leaves the currently innermost while loop using its end-label
@@ -492,6 +500,8 @@ static void generate_break_statement()
   // Generate the break statement, jumping out past the end of the current innermost while loop.
   // You can use a global variable to keep track of the current innermost call to
   // generate_while_statement().
+
+  EMIT("jmp %s", current_end_loop_label);
 }
 
 // Recursively generate the given statement node, and all sub-statements.
