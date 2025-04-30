@@ -69,7 +69,7 @@ array_indexing :
       identifier '[' expression ']' { $$ = MKNODE2(ARRAY_INDEXING, $1, $3); }
     ;
 variable_list :
-      identifier { MKNODE1(LIST, $1); }
+      identifier { $$ = MKNODE1(LIST, $1); }
     | variable_list ',' identifier { $$ = LIST_ADD($1, $3); }
     ;
 local_declaration :
@@ -81,20 +81,20 @@ local_declaration_list :
     ;
 parameter_list :
       variable_list { $$ = $1; }
-    | { $$ = MKNODE0(LIST); }
+    | { $$ = MKNODE0(LIST); }
     ;
 function :
       FUNC identifier '(' parameter_list ')' statement { $$ = MKNODE3(FUNCTION, $2, $4, $6); }
     ;
 statement :
-      assignement_statement { $$ = $1; }
-    | return_statement      { $$ = $1; }
-    | print_statement       { $$ = $1; }
-    | if_statement          { $$ = $1; }
-    | while_statement       { $$ = $1; }
-    | break_statement       { $$ = $1; }
-    | function_call         { $$ = $1; }
-    | block                 { $$ = $1; }
+      assignment_statement { $$ = $1; } 
+    | return_statement     { $$ = $1; }
+    | print_statement      { $$ = $1; }
+    | if_statement         { $$ = $1; }
+    | while_statement      { $$ = $1; }
+    | break_statement      { $$ = $1; }
+    | function_call        { $$ = $1; }
+    | block                { $$ = $1; }
     ;
 block :
       '{' local_declaration_list statement_list '}' { $$ = MKNODE2(BLOCK, $2, $3); }

@@ -12,7 +12,7 @@
 %option array
 %option yylineno
 
-WHITESPACE [ \t\n\r]
+WHITESPACE [ \t\n\r\v]
 COMMENT \/\/[^\n]+
 QUOTED \"([^\"\n]|\\\")*\"
 NUMBER [0-9]+
@@ -23,6 +23,7 @@ IDENTIFIER [A-Za-z_][A-Za-z0-9_]*
 {COMMENT}               { /* Eliminate comments */ }
 {QUOTED}                { return STRING_TOKEN; }
 func                    { return FUNC; }
+var                     { return VAR; }
 print                   { return PRINT; }
 return                  { return RETURN; }
 break                   { return BREAK; }

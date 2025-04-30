@@ -373,8 +373,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 		YY_FATAL_ERROR( "token too large, exceeds YYLMAX" ); \
 	yy_flex_strncpy( yytext, (yytext_ptr), yyleng + 1 ); \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 16
-#define YY_END_OF_BUFFER 17
+#define YY_NUM_RULES 17
+#define YY_END_OF_BUFFER 18
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -382,20 +382,20 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[58] =
+static const flex_int16_t yy_accept[61] =
     {   0,
-        0,    0,   17,   15,    1,    1,   15,   15,   13,   14,
-       14,   14,   14,   14,   14,   14,   14,   14,   14,    1,
-        0,    3,    0,    0,   13,   14,   14,   12,   14,   14,
-        8,   14,   14,   14,   14,    3,    2,   14,   14,   14,
-       14,   14,   14,   14,   14,   10,    4,   14,   14,    9,
-       14,    7,    5,   14,   11,    6,    0
+        0,    0,   18,   16,    1,    1,   16,   16,   14,   15,
+       15,   15,   15,   15,   15,   15,   15,   15,   15,   15,
+        1,    0,    3,    0,    0,   14,   15,   15,   13,   15,
+       15,    9,   15,   15,   15,   15,   15,    3,    2,   15,
+       15,   15,   15,   15,   15,    5,   15,   15,   11,    4,
+       15,   15,   10,   15,    8,    6,   15,   12,    7,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
-        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
+        2,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    2,    1,    4,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    5,    6,    6,    6,
@@ -406,7 +406,7 @@ static const YY_CHAR yy_ec[256] =
         1,    8,    1,    1,    7,    1,    9,   10,   11,   12,
 
        13,   14,    7,   15,   16,    7,   17,   18,    7,   19,
-       20,   21,    7,   22,   23,   24,   25,    7,   26,    7,
+       20,   21,    7,   22,   23,   24,   25,   26,   27,    7,
         7,    7,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -424,69 +424,71 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[27] =
+static const YY_CHAR yy_meta[28] =
     {   0,
         1,    1,    2,    1,    1,    3,    3,    1,    3,    3,
         3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
-        3,    3,    3,    3,    3,    3
+        3,    3,    3,    3,    3,    3,    3
     } ;
 
-static const flex_int16_t yy_base[61] =
+static const flex_int16_t yy_base[64] =
     {   0,
-        0,    0,   77,   78,   25,   27,   27,   71,   69,    0,
-       52,   53,   54,   46,   56,   47,   55,   52,   51,   30,
-       30,   78,   32,    0,   59,    0,   51,    0,   40,   43,
-        0,   45,   36,   46,   42,   33,    0,   48,   43,   44,
-       35,   28,   33,   33,   33,    0,    0,   25,   26,    0,
-       33,    0,    0,   24,    0,    0,   78,   41,   36,   44
+        0,    0,   80,   81,   26,   28,   28,   74,   72,    0,
+       55,   56,   57,   49,   59,   50,   58,   55,   60,   53,
+       31,   31,   81,   33,    0,   61,    0,   53,    0,   42,
+       45,    0,   47,   38,   48,   38,   43,   34,    0,   49,
+       44,   45,   36,   29,   34,    0,   34,   34,    0,    0,
+       26,   27,    0,   34,    0,    0,   25,    0,    0,   81,
+       42,   37,   45
     } ;
 
-static const flex_int16_t yy_def[61] =
+static const flex_int16_t yy_def[64] =
     {   0,
-       57,    1,   57,   57,   57,   57,   58,   57,   57,   59,
-       59,   59,   59,   59,   59,   59,   59,   59,   59,   57,
-       58,   57,   58,   60,   57,   59,   59,   59,   59,   59,
-       59,   59,   59,   59,   59,   58,   60,   59,   59,   59,
-       59,   59,   59,   59,   59,   59,   59,   59,   59,   59,
-       59,   59,   59,   59,   59,   59,    0,   57,   57,   57
+       60,    1,   60,   60,   60,   60,   61,   60,   60,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,   62,
+       60,   61,   60,   61,   63,   60,   62,   62,   62,   62,
+       62,   62,   62,   62,   62,   62,   62,   61,   63,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,    0,
+       60,   60,   60
     } ;
 
-static const flex_int16_t yy_nxt[105] =
+static const flex_int16_t yy_nxt[109] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,    4,   10,   11,
        10,   12,   13,   14,   10,   15,   10,   10,   10,   10,
-       16,   17,   10,   18,   10,   19,   20,   20,   20,   20,
-       22,   20,   20,   22,   23,   36,   22,   23,   26,   23,
-       23,   21,   56,   21,   37,   55,   37,   54,   53,   52,
-       51,   50,   49,   48,   47,   46,   45,   44,   43,   42,
-       41,   40,   39,   38,   25,   35,   34,   33,   32,   31,
-       30,   29,   28,   27,   25,   24,   57,    3,   57,   57,
-       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
-       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       16,   17,   10,   18,   10,   19,   20,   21,   21,   21,
+       21,   23,   21,   21,   23,   24,   38,   23,   24,   27,
+       24,   24,   22,   59,   22,   39,   58,   39,   57,   56,
+       55,   54,   53,   52,   51,   50,   49,   48,   47,   46,
+       45,   44,   43,   42,   41,   40,   26,   37,   36,   35,
+       34,   33,   32,   31,   30,   29,   28,   26,   25,   60,
+        3,   60,   60,   60,   60,   60,   60,   60,   60,   60,
+       60,   60,   60,   60,   60,   60,   60,   60,   60,   60,
 
-       57,   57,   57,   57
+       60,   60,   60,   60,   60,   60,   60,   60
     } ;
 
-static const flex_int16_t yy_chk[105] =
+static const flex_int16_t yy_chk[109] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    5,    5,    6,    6,
-        7,   20,   20,   21,    7,   23,   36,   21,   59,   23,
-       36,   58,   54,   58,   60,   51,   60,   49,   48,   45,
-       44,   43,   42,   41,   40,   39,   38,   35,   34,   33,
-       32,   30,   29,   27,   25,   19,   18,   17,   16,   15,
-       14,   13,   12,   11,    9,    8,    3,   57,   57,   57,
-       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
-       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+        1,    1,    1,    1,    1,    1,    1,    5,    5,    6,
+        6,    7,   21,   21,   22,    7,   24,   38,   22,   62,
+       24,   38,   61,   57,   61,   63,   54,   63,   52,   51,
+       48,   47,   45,   44,   43,   42,   41,   40,   37,   36,
+       35,   34,   33,   31,   30,   28,   26,   20,   19,   18,
+       17,   16,   15,   14,   13,   12,   11,    9,    8,    3,
+       60,   60,   60,   60,   60,   60,   60,   60,   60,   60,
+       60,   60,   60,   60,   60,   60,   60,   60,   60,   60,
 
-       57,   57,   57,   57
+       60,   60,   60,   60,   60,   60,   60,   60
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[17] =
+static const flex_int32_t yy_rule_can_match_eol[18] =
     {   0,
-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
+1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -516,8 +518,8 @@ char *yytext_ptr;
 
 // parser.h contains some unused functions, ignore that
 #pragma GCC diagnostic ignored "-Wunused-function"
-#line 519 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/scanner.c"
-#line 520 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/scanner.c"
+#line 521 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/scanner.c"
+#line 522 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/scanner.c"
 
 #define INITIAL 0
 
@@ -736,7 +738,7 @@ YY_DECL
 	{
 #line 21 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
 
-#line 739 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/scanner.c"
+#line 741 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/scanner.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -763,13 +765,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 58 )
+				if ( yy_current_state >= 61 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 78 );
+		while ( yy_base[yy_current_state] != 81 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -827,65 +829,70 @@ YY_RULE_SETUP
 case 5:
 YY_RULE_SETUP
 #line 26 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return PRINT; }
+{ return VAR; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 27 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return RETURN; }
+{ return PRINT; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 28 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return BREAK; }
+{ return RETURN; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 29 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return IF; }
+{ return BREAK; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 30 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return THEN; }
+{ return IF; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 31 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return ELSE; }
+{ return THEN; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 32 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return WHILE; } 
+{ return ELSE; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 33 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return DO; }
+{ return WHILE; } 
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 34 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return NUMBER_TOKEN; }
+{ return DO; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 35 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
+{ return NUMBER_TOKEN; }
+	YY_BREAK
+case 15:
+YY_RULE_SETUP
+#line 36 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
 { return IDENTIFIER_TOKEN; }
 	YY_BREAK
 /* All other chars get returned as single char tokens */
-case 15:
-YY_RULE_SETUP
-#line 37 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
-{ return yytext[0]; }
-	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 38 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
+{ return yytext[0]; }
+	YY_BREAK
+case 17:
+YY_RULE_SETUP
+#line 39 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
 ECHO;
 	YY_BREAK
-#line 888 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/scanner.c"
+#line 895 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/scanner.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1182,7 +1189,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 58 )
+			if ( yy_current_state >= 61 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1210,11 +1217,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 58 )
+		if ( yy_current_state >= 61 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 57);
+	yy_is_jam = (yy_current_state == 60);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1902,6 +1909,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 38 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
+#line 39 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/scanner.l"
 
 

@@ -86,8 +86,18 @@ int yyerror(const char *error)
 }
 
 // Feel free to define #define macros if you want to
+#define MKNODE0(type) node_create((type), 0)
 
-#line 91 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+#define MKNODE1(type, c1) node_create((type), 1, (c1))
+
+#define MKNODE2(type, c1, c2) node_create((type), 2, (c1), (c2))
+
+#define MKNODE3(type, c1, c2, c3) node_create((type), 3, (c1), (c2), (c3))
+
+#define LIST_ADD(list, node) append_to_list_node(list, node)
+
+
+#line 101 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -141,14 +151,43 @@ enum yysymbol_kind_t
   YYSYMBOL_23_ = 23,                       /* '/'  */
   YYSYMBOL_UNARY_OPERATORS = 24,           /* UNARY_OPERATORS  */
   YYSYMBOL_25_ = 25,                       /* ','  */
-  YYSYMBOL_YYACCEPT = 26,                  /* $accept  */
-  YYSYMBOL_program = 27,                   /* program  */
-  YYSYMBOL_global_list = 28,               /* global_list  */
-  YYSYMBOL_global = 29,                    /* global  */
-  YYSYMBOL_global_declaration = 30,        /* global_declaration  */
-  YYSYMBOL_global_variable_list = 31,      /* global_variable_list  */
-  YYSYMBOL_global_variable = 32,           /* global_variable  */
-  YYSYMBOL_identifier = 33                 /* identifier  */
+  YYSYMBOL_26_ = 26,                       /* '['  */
+  YYSYMBOL_27_ = 27,                       /* ']'  */
+  YYSYMBOL_28_ = 28,                       /* '('  */
+  YYSYMBOL_29_ = 29,                       /* ')'  */
+  YYSYMBOL_30_ = 30,                       /* '{'  */
+  YYSYMBOL_31_ = 31,                       /* '}'  */
+  YYSYMBOL_YYACCEPT = 32,                  /* $accept  */
+  YYSYMBOL_program = 33,                   /* program  */
+  YYSYMBOL_global_list = 34,               /* global_list  */
+  YYSYMBOL_global = 35,                    /* global  */
+  YYSYMBOL_global_declaration = 36,        /* global_declaration  */
+  YYSYMBOL_global_variable_list = 37,      /* global_variable_list  */
+  YYSYMBOL_global_variable = 38,           /* global_variable  */
+  YYSYMBOL_array_indexing = 39,            /* array_indexing  */
+  YYSYMBOL_variable_list = 40,             /* variable_list  */
+  YYSYMBOL_local_declaration = 41,         /* local_declaration  */
+  YYSYMBOL_local_declaration_list = 42,    /* local_declaration_list  */
+  YYSYMBOL_parameter_list = 43,            /* parameter_list  */
+  YYSYMBOL_function = 44,                  /* function  */
+  YYSYMBOL_statement = 45,                 /* statement  */
+  YYSYMBOL_block = 46,                     /* block  */
+  YYSYMBOL_statement_list = 47,            /* statement_list  */
+  YYSYMBOL_assignment_statement = 48,      /* assignment_statement  */
+  YYSYMBOL_return_statement = 49,          /* return_statement  */
+  YYSYMBOL_print_statement = 50,           /* print_statement  */
+  YYSYMBOL_print_list = 51,                /* print_list  */
+  YYSYMBOL_print_item = 52,                /* print_item  */
+  YYSYMBOL_break_statement = 53,           /* break_statement  */
+  YYSYMBOL_if_statement = 54,              /* if_statement  */
+  YYSYMBOL_while_statement = 55,           /* while_statement  */
+  YYSYMBOL_expression = 56,                /* expression  */
+  YYSYMBOL_function_call = 57,             /* function_call  */
+  YYSYMBOL_argument_list = 58,             /* argument_list  */
+  YYSYMBOL_expression_list = 59,           /* expression_list  */
+  YYSYMBOL_identifier = 60,                /* identifier  */
+  YYSYMBOL_number = 61,                    /* number  */
+  YYSYMBOL_string = 62                     /* string  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -474,18 +513,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  10
+#define YYFINAL  14
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   5
+#define YYLAST   243
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  26
+#define YYNTOKENS  32
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  8
+#define YYNNTS  31
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  10
+#define YYNRULES  69
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  14
+#define YYNSTATES  117
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   271
@@ -506,15 +545,15 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,    17,     2,     2,     2,     2,     2,     2,
-       2,     2,    22,    20,    25,    21,     2,    23,     2,     2,
+      28,    29,    22,    20,    25,    21,     2,    23,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
       18,    16,    19,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,    26,     2,    27,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    30,     2,    31,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -534,10 +573,15 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    37,    37,    40,    41,    44,    47,    50,    51,    54,
-      57
+       0,    47,    47,    50,    51,    54,    55,    58,    61,    62,
+      65,    66,    69,    72,    73,    76,    79,    80,    83,    84,
+      87,    90,    91,    92,    93,    94,    95,    96,    97,   100,
+     101,   104,   105,   108,   109,   112,   115,   118,   119,   122,
+     123,   126,   129,   130,   133,   136,   141,   146,   151,   156,
+     161,   166,   171,   176,   181,   186,   191,   196,   200,   204,
+     208,   212,   218,   221,   222,   225,   226,   229,   237,   244
 };
 #endif
 
@@ -556,9 +600,16 @@ static const char *const yytname[] =
   "\"end of file\"", "error", "\"invalid token\"", "FUNC", "PRINT",
   "RETURN", "BREAK", "IF", "THEN", "ELSE", "WHILE", "DO", "VAR",
   "NUMBER_TOKEN", "IDENTIFIER_TOKEN", "STRING_TOKEN", "'='", "'!'", "'<'",
-  "'>'", "'+'", "'-'", "'*'", "'/'", "UNARY_OPERATORS", "','", "$accept",
-  "program", "global_list", "global", "global_declaration",
-  "global_variable_list", "global_variable", "identifier", YY_NULLPTR
+  "'>'", "'+'", "'-'", "'*'", "'/'", "UNARY_OPERATORS", "','", "'['",
+  "']'", "'('", "')'", "'{'", "'}'", "$accept", "program", "global_list",
+  "global", "global_declaration", "global_variable_list",
+  "global_variable", "array_indexing", "variable_list",
+  "local_declaration", "local_declaration_list", "parameter_list",
+  "function", "statement", "block", "statement_list",
+  "assignment_statement", "return_statement", "print_statement",
+  "print_list", "print_item", "break_statement", "if_statement",
+  "while_statement", "expression", "function_call", "argument_list",
+  "expression_list", "identifier", "number", "string", YY_NULLPTR
 };
 
 static const char *
@@ -568,7 +619,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-23)
+#define YYPACT_NINF (-32)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -580,10 +631,20 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-static const yytype_int8 yypact[] =
+static const yytype_int16 yypact[] =
 {
-     -12,   -13,     2,   -12,   -23,   -23,   -23,   -22,   -23,   -23,
-     -23,   -23,   -13,   -23
+       0,    16,    16,    14,     0,   -32,   -32,   -32,   -32,   -15,
+      10,   -32,   -32,    19,   -32,   -32,    16,    16,    64,    36,
+      21,   -32,   -32,   -32,    64,    64,    64,   -32,   208,   -32,
+      28,   -32,    16,   147,   -32,   -32,   186,    43,    47,    12,
+      25,    64,    64,    64,    64,   -32,    64,   -32,    34,    64,
+     -32,    64,    64,   159,    48,   -32,   -32,   -32,   -32,   -32,
+     -32,   -32,   -32,   -32,     8,   -32,    64,    64,    64,   -12,
+      64,   -12,   -18,   -18,   -32,   -32,   220,    37,    42,   -32,
+      44,   -32,   220,   -32,   220,   178,   200,    16,   -32,   159,
+     -32,    13,    64,    64,   160,   160,   160,   160,   -32,    64,
+      34,   147,   147,    36,   -32,   116,   -32,   -32,   220,   220,
+     220,   -32,    59,   -32,   -32,   147,   -32
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -591,20 +652,36 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     2,     3,     5,    10,     6,     7,     9,
-       1,     4,     0,     8
+       0,     0,     0,     0,     2,     3,     6,     5,    67,     0,
+       7,     8,    11,    10,     1,     4,    19,     0,     0,    18,
+       0,    13,     9,    68,     0,     0,     0,    60,     0,    61,
+      59,    58,     0,     0,    56,    55,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    12,    64,    14,     0,     0,
+      41,     0,     0,     0,     0,    20,    28,    21,    22,    23,
+      26,    24,    25,    27,     0,    57,     0,     0,     0,    47,
+       0,    49,    51,    52,    53,    54,    65,     0,    63,    69,
+      36,    37,    39,    40,    35,     0,     0,     0,    16,     0,
+      31,     0,     0,     0,    45,    46,    48,    50,    62,     0,
+       0,     0,     0,    15,    17,     0,    30,    32,    34,    33,
+      66,    38,    42,    44,    29,     0,    43
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -23,   -23,   -23,     1,   -23,   -23,    -7,   -23
+     -32,   -32,   -32,    68,   -32,   -32,    56,     4,    -7,    -6,
+     -32,   -32,   -32,   -26,   -32,    -2,   -32,   -32,   -32,   -32,
+      -9,   -32,   -32,   -32,    92,   -31,   -32,   -32,    -1,   -32,
+     -32
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     3,     4,     5,     7,     8,     9
+       0,     3,     4,     5,     6,    10,    11,    27,    19,    88,
+      89,    20,     7,    90,    56,    91,    57,    58,    59,    80,
+      81,    60,    61,    62,    82,    29,    77,    78,    30,    31,
+      83
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -612,34 +689,102 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     6,    10,    12,    11,    13
+       9,    13,    63,     1,    43,    44,    12,    55,    41,    42,
+      43,    44,     2,    16,    14,    21,    13,    48,    49,    50,
+      51,    12,    63,    52,    93,    23,     8,     8,    68,    24,
+       8,    47,    64,    25,    18,    17,    46,    54,    23,     8,
+      26,    70,    24,    53,   106,    18,    25,    23,     8,    79,
+      33,    24,    64,    26,    18,    25,    46,    54,    63,    66,
+      63,    32,    26,    67,    92,   107,    98,    99,   115,   100,
+      63,    63,    15,    22,    63,   112,   113,    23,     8,   107,
+     103,    24,     0,   104,    63,    25,    21,   105,    64,   116,
+      64,   111,    26,    54,     0,    54,     0,     0,     0,     0,
+      64,    64,     0,     0,    64,    54,    54,     0,     0,    54,
+      28,     0,     0,     0,    64,     0,    34,    35,    36,    54,
+      48,    49,    50,    51,     0,     0,    52,     0,     0,     0,
+       8,    69,    71,    72,    73,    74,    75,     0,    76,     0,
+       0,    84,     0,    85,    86,     0,    53,   114,     0,     0,
+       0,    48,    49,    50,    51,     0,     0,    52,    94,    95,
+      96,     8,    97,    48,    49,    50,    51,     0,     0,    52,
+       0,    87,     0,     8,     0,     0,     0,    53,    39,    40,
+      41,    42,    43,    44,   108,   109,   101,     0,     0,    53,
+       0,   110,     0,     0,    37,    38,    39,    40,    41,    42,
+      43,    44,    37,    38,    39,    40,    41,    42,    43,    44,
+       0,   102,     0,     0,     0,    65,    37,    38,    39,    40,
+      41,    42,    43,    44,    37,    38,    39,    40,    41,    42,
+      43,    44,     0,     0,     0,    45,    37,    38,    39,    40,
+      41,    42,    43,    44
 };
 
 static const yytype_int8 yycheck[] =
 {
-      12,    14,     0,    25,     3,    12
+       1,     2,    33,     3,    22,    23,     2,    33,    20,    21,
+      22,    23,    12,    28,     0,    16,    17,     4,     5,     6,
+       7,    17,    53,    10,    16,    13,    14,    14,    16,    17,
+      14,    32,    33,    21,    26,    25,    28,    33,    13,    14,
+      28,    16,    17,    30,    31,    26,    21,    13,    14,    15,
+      29,    17,    53,    28,    26,    21,    28,    53,    89,    16,
+      91,    25,    28,    16,    16,    91,    29,    25,     9,    25,
+     101,   102,     4,    17,   105,   101,   102,    13,    14,   105,
+      87,    17,    -1,    89,   115,    21,    87,    89,    89,   115,
+      91,   100,    28,    89,    -1,    91,    -1,    -1,    -1,    -1,
+     101,   102,    -1,    -1,   105,   101,   102,    -1,    -1,   105,
+      18,    -1,    -1,    -1,   115,    -1,    24,    25,    26,   115,
+       4,     5,     6,     7,    -1,    -1,    10,    -1,    -1,    -1,
+      14,    39,    40,    41,    42,    43,    44,    -1,    46,    -1,
+      -1,    49,    -1,    51,    52,    -1,    30,    31,    -1,    -1,
+      -1,     4,     5,     6,     7,    -1,    -1,    10,    66,    67,
+      68,    14,    70,     4,     5,     6,     7,    -1,    -1,    10,
+      -1,    12,    -1,    14,    -1,    -1,    -1,    30,    18,    19,
+      20,    21,    22,    23,    92,    93,     8,    -1,    -1,    30,
+      -1,    99,    -1,    -1,    16,    17,    18,    19,    20,    21,
+      22,    23,    16,    17,    18,    19,    20,    21,    22,    23,
+      -1,    11,    -1,    -1,    -1,    29,    16,    17,    18,    19,
+      20,    21,    22,    23,    16,    17,    18,    19,    20,    21,
+      22,    23,    -1,    -1,    -1,    27,    16,    17,    18,    19,
+      20,    21,    22,    23
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    12,    27,    28,    29,    30,    14,    31,    32,    33,
-       0,    29,    25,    32
+       0,     3,    12,    33,    34,    35,    36,    44,    14,    60,
+      37,    38,    39,    60,     0,    35,    28,    25,    26,    40,
+      43,    60,    38,    13,    17,    21,    28,    39,    56,    57,
+      60,    61,    25,    29,    56,    56,    56,    16,    17,    18,
+      19,    20,    21,    22,    23,    27,    28,    60,     4,     5,
+       6,     7,    10,    30,    39,    45,    46,    48,    49,    50,
+      53,    54,    55,    57,    60,    29,    16,    16,    16,    56,
+      16,    56,    56,    56,    56,    56,    56,    58,    59,    15,
+      51,    52,    56,    62,    56,    56,    56,    12,    41,    42,
+      45,    47,    16,    16,    56,    56,    56,    56,    29,    25,
+      25,     8,    11,    40,    41,    47,    31,    45,    56,    56,
+      56,    52,    45,    45,    31,     9,    45
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    26,    27,    28,    28,    29,    30,    31,    31,    32,
-      33
+       0,    32,    33,    34,    34,    35,    35,    36,    37,    37,
+      38,    38,    39,    40,    40,    41,    42,    42,    43,    43,
+      44,    45,    45,    45,    45,    45,    45,    45,    45,    46,
+      46,    47,    47,    48,    48,    49,    50,    51,    51,    52,
+      52,    53,    54,    54,    55,    56,    56,    56,    56,    56,
+      56,    56,    56,    56,    56,    56,    56,    56,    56,    56,
+      56,    56,    57,    58,    58,    59,    59,    60,    61,    62
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     1,     2,     1,     2,     1,     3,     1,
-       1
+       0,     2,     1,     1,     2,     1,     1,     2,     1,     3,
+       1,     1,     4,     1,     3,     2,     1,     2,     1,     0,
+       6,     1,     1,     1,     1,     1,     1,     1,     1,     4,
+       3,     1,     2,     3,     3,     2,     2,     1,     3,     1,
+       1,     1,     4,     6,     4,     4,     4,     3,     4,     3,
+       4,     3,     3,     3,     3,     2,     2,     3,     1,     1,
+       1,     1,     4,     1,     0,     1,     3,     1,     1,     1
 };
 
 
@@ -1103,66 +1248,471 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: global_list  */
-#line 37 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+#line 47 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
                   { root = yyvsp[0]; }
-#line 1109 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+#line 1254 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
     break;
 
   case 3: /* global_list: global  */
-#line 40 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
-             { yyval = node_create(LIST, 1, yyvsp[0]); }
-#line 1115 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+#line 50 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+             { yyval = MKNODE1(LIST, yyvsp[0]); }
+#line 1260 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
     break;
 
   case 4: /* global_list: global_list global  */
-#line 41 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
-                         { yyval = append_to_list_node(yyvsp[-1], yyvsp[0]); }
-#line 1121 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
-    break;
-
-  case 5: /* global: global_declaration  */
-#line 44 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
-                         { yyval = yyvsp[0]; }
-#line 1127 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
-    break;
-
-  case 6: /* global_declaration: VAR global_variable_list  */
-#line 47 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
-                               { yyval = node_create(GLOBAL_DECLARATION, 1, yyvsp[0]); }
-#line 1133 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
-    break;
-
-  case 7: /* global_variable_list: global_variable  */
-#line 50 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
-                      { yyval = node_create(LIST, 1, yyvsp[0]); }
-#line 1139 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
-    break;
-
-  case 8: /* global_variable_list: global_variable_list ',' global_variable  */
 #line 51 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
-                                               { yyval = append_to_list_node(yyvsp[-2], yyvsp[0]); }
-#line 1145 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+                         { yyval = LIST_ADD(yyvsp[-1], yyvsp[0]); }
+#line 1266 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
     break;
 
-  case 9: /* global_variable: identifier  */
+  case 5: /* global: function  */
 #line 54 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
-                 { yyval = yyvsp[0]; }
-#line 1151 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+               { yyval = yyvsp[0]; }
+#line 1272 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
     break;
 
-  case 10: /* identifier: IDENTIFIER_TOKEN  */
+  case 6: /* global: global_declaration  */
+#line 55 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                         { yyval = yyvsp[0]; }
+#line 1278 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 7: /* global_declaration: VAR global_variable_list  */
 #line 58 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
-      {
-        // Create a node with 0 children to represent the identifier
-        yyval = node_create(IDENTIFIER, 0);
-        // Allocate a copy of yytext to keep in the syntax tree as data
-        yyval->data.identifier = strdup(yytext);
-      }
-#line 1162 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+                               { yyval = MKNODE1(GLOBAL_DECLARATION, yyvsp[0]); }
+#line 1284 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 8: /* global_variable_list: global_variable  */
+#line 61 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                      { yyval = MKNODE1(LIST, yyvsp[0]); }
+#line 1290 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 9: /* global_variable_list: global_variable_list ',' global_variable  */
+#line 62 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                               { yyval = LIST_ADD(yyvsp[-2], yyvsp[0]); }
+#line 1296 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 10: /* global_variable: identifier  */
+#line 65 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                 { yyval = yyvsp[0]; }
+#line 1302 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 11: /* global_variable: array_indexing  */
+#line 66 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                     { yyval = yyvsp[0]; }
+#line 1308 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 12: /* array_indexing: identifier '[' expression ']'  */
+#line 69 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                    { yyval = MKNODE2(ARRAY_INDEXING, yyvsp[-3], yyvsp[-1]); }
+#line 1314 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 13: /* variable_list: identifier  */
+#line 72 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                 { yyval = MKNODE1(LIST, yyvsp[0]); }
+#line 1320 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 14: /* variable_list: variable_list ',' identifier  */
+#line 73 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                   { yyval = LIST_ADD(yyvsp[-2], yyvsp[0]); }
+#line 1326 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 15: /* local_declaration: VAR variable_list  */
+#line 76 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                        { yyval = yyvsp[0]; }
+#line 1332 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 16: /* local_declaration_list: local_declaration  */
+#line 79 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                        { yyval = MKNODE1(LIST, yyvsp[0]); }
+#line 1338 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 17: /* local_declaration_list: local_declaration_list local_declaration  */
+#line 80 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                               { yyval = LIST_ADD(yyvsp[-1], yyvsp[0]); }
+#line 1344 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 18: /* parameter_list: variable_list  */
+#line 83 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                    { yyval = yyvsp[0]; }
+#line 1350 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 19: /* parameter_list: %empty  */
+#line 84 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+      { yyval = MKNODE0(LIST); }
+#line 1356 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 20: /* function: FUNC identifier '(' parameter_list ')' statement  */
+#line 87 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                                       { yyval = MKNODE3(FUNCTION, yyvsp[-4], yyvsp[-2], yyvsp[0]); }
+#line 1362 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 21: /* statement: assignment_statement  */
+#line 90 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                           { yyval = yyvsp[0]; }
+#line 1368 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 22: /* statement: return_statement  */
+#line 91 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                           { yyval = yyvsp[0]; }
+#line 1374 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 23: /* statement: print_statement  */
+#line 92 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                           { yyval = yyvsp[0]; }
+#line 1380 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 24: /* statement: if_statement  */
+#line 93 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                           { yyval = yyvsp[0]; }
+#line 1386 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 25: /* statement: while_statement  */
+#line 94 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                           { yyval = yyvsp[0]; }
+#line 1392 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 26: /* statement: break_statement  */
+#line 95 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                           { yyval = yyvsp[0]; }
+#line 1398 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 27: /* statement: function_call  */
+#line 96 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                           { yyval = yyvsp[0]; }
+#line 1404 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 28: /* statement: block  */
+#line 97 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                           { yyval = yyvsp[0]; }
+#line 1410 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 29: /* block: '{' local_declaration_list statement_list '}'  */
+#line 100 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                                    { yyval = MKNODE2(BLOCK, yyvsp[-2], yyvsp[-1]); }
+#line 1416 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 30: /* block: '{' statement_list '}'  */
+#line 101 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                             { yyval = MKNODE1(BLOCK, yyvsp[-1]); }
+#line 1422 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 31: /* statement_list: statement  */
+#line 104 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                { yyval = MKNODE1(LIST, yyvsp[0]); }
+#line 1428 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 32: /* statement_list: statement_list statement  */
+#line 105 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                               { yyval = LIST_ADD(yyvsp[-1], yyvsp[0]); }
+#line 1434 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 33: /* assignment_statement: identifier '=' expression  */
+#line 108 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                    { yyval = MKNODE2(ASSIGNMENT_STATEMENT, yyvsp[-2], yyvsp[0]); }
+#line 1440 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 34: /* assignment_statement: array_indexing '=' expression  */
+#line 109 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                    { yyval = MKNODE2(ASSIGNMENT_STATEMENT, yyvsp[-2], yyvsp[0]); }
+#line 1446 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 35: /* return_statement: RETURN expression  */
+#line 112 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                        { yyval = MKNODE1(RETURN_STATEMENT, yyvsp[0]); }
+#line 1452 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 36: /* print_statement: PRINT print_list  */
+#line 115 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                       { yyval = MKNODE1(PRINT_STATEMENT, yyvsp[0]); }
+#line 1458 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 37: /* print_list: print_item  */
+#line 118 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                 { yyval = MKNODE1(LIST, yyvsp[0]); }
+#line 1464 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 38: /* print_list: print_list ',' print_item  */
+#line 119 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                { yyval = LIST_ADD(yyvsp[-2], yyvsp[0]); }
+#line 1470 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 39: /* print_item: expression  */
+#line 122 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                 { yyval = yyvsp[0]; }
+#line 1476 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 40: /* print_item: string  */
+#line 123 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                 { yyval = yyvsp[0]; }
+#line 1482 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 41: /* break_statement: BREAK  */
+#line 126 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+            { yyval = MKNODE0(BREAK_STATEMENT); }
+#line 1488 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 42: /* if_statement: IF expression THEN statement  */
+#line 129 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                   { yyval = MKNODE2(IF_STATEMENT, yyvsp[-2], yyvsp[0]); }
+#line 1494 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 43: /* if_statement: IF expression THEN statement ELSE statement  */
+#line 130 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                                  { yyval = MKNODE3(IF_STATEMENT, yyvsp[-4], yyvsp[-2], yyvsp[0]); }
+#line 1500 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 44: /* while_statement: WHILE expression DO statement  */
+#line 133 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                    { yyval = MKNODE2(WHILE_STATEMENT, yyvsp[-2], yyvsp[0]); }
+#line 1506 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 45: /* expression: expression '=' '=' expression  */
+#line 137 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-3], yyvsp[0]);
+          yyval->data.operator = "==";
+        }
+#line 1515 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 46: /* expression: expression '!' '=' expression  */
+#line 142 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-3], yyvsp[0]);
+          yyval->data.operator = "!=";
+        }
+#line 1524 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 47: /* expression: expression '<' expression  */
+#line 147 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-2], yyvsp[0]);
+          yyval->data.operator = "<";
+        }
+#line 1533 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 48: /* expression: expression '<' '=' expression  */
+#line 152 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-3], yyvsp[0]);
+          yyval->data.operator = "<=";
+        }
+#line 1542 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 49: /* expression: expression '>' expression  */
+#line 157 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-2], yyvsp[0]);
+          yyval->data.operator = ">";
+        }
+#line 1551 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 50: /* expression: expression '>' '=' expression  */
+#line 162 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-3], yyvsp[0]);
+          yyval->data.operator = ">=";
+        }
+#line 1560 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 51: /* expression: expression '+' expression  */
+#line 167 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-2], yyvsp[0]);
+          yyval->data.operator = "+";
+        }
+#line 1569 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 52: /* expression: expression '-' expression  */
+#line 172 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-2], yyvsp[0]);
+          yyval->data.operator = "-";
+        }
+#line 1578 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 53: /* expression: expression '*' expression  */
+#line 177 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-2], yyvsp[0]);
+          yyval->data.operator = "*";
+        }
+#line 1587 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 54: /* expression: expression '/' expression  */
+#line 182 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE2(OPERATOR, yyvsp[-2], yyvsp[0]);
+          yyval->data.operator = "/";
+        }
+#line 1596 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 55: /* expression: '-' expression  */
+#line 187 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE1(OPERATOR, yyvsp[0]);
+          yyval->data.operator = "-";
+        }
+#line 1605 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 56: /* expression: '!' expression  */
+#line 192 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE1(OPERATOR, yyvsp[0]);
+          yyval->data.operator = "!";
+        }
+#line 1614 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 57: /* expression: '(' expression ')'  */
+#line 197 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = yyvsp[-1];
+        }
+#line 1622 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 58: /* expression: number  */
+#line 201 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = yyvsp[0];
+        }
+#line 1630 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 59: /* expression: identifier  */
+#line 205 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = yyvsp[0];
+        }
+#line 1638 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 60: /* expression: array_indexing  */
+#line 209 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = yyvsp[0];
+        }
+#line 1646 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 61: /* expression: function_call  */
+#line 213 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = yyvsp[0];
+        }
+#line 1654 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 62: /* function_call: identifier '(' argument_list ')'  */
+#line 218 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                       { yyval = MKNODE2(FUNCTION_CALL, yyvsp[-3], yyvsp[-1]); }
+#line 1660 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 63: /* argument_list: expression_list  */
+#line 221 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                      { yyval = yyvsp[0]; }
+#line 1666 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 64: /* argument_list: %empty  */
+#line 222 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+      { yyval = MKNODE0(LIST); }
+#line 1672 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 65: /* expression_list: expression  */
+#line 225 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                 { yyval = MKNODE1(LIST, yyvsp[0]); }
+#line 1678 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 66: /* expression_list: expression_list ',' expression  */
+#line 226 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+                                     { yyval = LIST_ADD(yyvsp[-2], yyvsp[0]); }
+#line 1684 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 67: /* identifier: IDENTIFIER_TOKEN  */
+#line 230 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE0(IDENTIFIER);
+          // Allocate a copy of yytext to keep in the syntax tree as data
+          yyval->data.identifier = strdup(yytext);
+        }
+#line 1694 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 68: /* number: NUMBER_TOKEN  */
+#line 238 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE0(NUMBER_LITERAL);
+          yyval->data.number_literal = strtol(yytext, NULL, 10);
+        }
+#line 1703 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+    break;
+
+  case 69: /* string: STRING_TOKEN  */
+#line 245 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+        {
+          yyval = MKNODE0(STRING_LITERAL);
+          yyval->data.string_literal = strdup(yytext);
+        }
+#line 1712 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
     break;
 
 
-#line 1166 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
+#line 1716 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/build/parser.c"
 
       default: break;
     }
@@ -1355,5 +1905,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 75 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
+#line 251 "/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep2/src/parser.y"
 
