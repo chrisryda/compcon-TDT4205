@@ -22,24 +22,6 @@ IDENTIFIER [A-Za-z_][A-Za-z0-9_]*
 {WHITESPACE}+           { /* Eliminate whitespace */ }
 {COMMENT}               { /* Eliminate comments */ }
 {QUOTED}                { return STRING_TOKEN; }
-
-/*
- * TODO:
- *
- * Add the rest of the translation rules here.
- * See the lexical structure definition of the modified VSL in PS2.
- * Also see the `%token` directives in parser.y for all symbolic names that can be returned - e.g. FUNC, IF, IDENTIFIER_TOKEN.
- *
- * Hint to get you started:
- * The WHITESPACE regex defined above is not quite finished. Finish it.
- * The scanner returns STRING_TOKEN when matching the QUOTED regex above.
- * When should the scanner return a NUMBER_TOKEN, IDENTIFIER_TOKEN, etc?
- * In which specific scenarios should the scanner return keyword tokens like FUNC or PRINT?
- *
- * For operators, which are all a single char or two chars, we let each char be a separate token.
- * This is achieved by using the "catch-all" rule at the very bottom of this file.
- */
-
 func                    { return FUNC; }
 print                   { return PRINT; }
 return                  { return RETURN; }
