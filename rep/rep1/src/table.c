@@ -58,4 +58,13 @@ void fillTable() {
     }
     table[6]['\n'] = ACCEPT;
     table[6][' '] = START;
+
+    // Task 2.5: Add support for comments
+    table[START]['/'] = 8;
+    table[8]['/'] = 9;
+    for (int c = 0; c < 256; c++) 
+    {
+        table[9][c] = 9;
+    }
+    table[9]['\n'] = ACCEPT;
 }
