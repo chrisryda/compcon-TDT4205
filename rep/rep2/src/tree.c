@@ -38,6 +38,25 @@ node_t* node_create(node_type_t type, size_t n_children, ...)
    * Remember to *allocate* space to hold the list of children children.
    * To access the parameters passed as ..., look up "C varargs"
    */
+
+   node_t** children = malloc(sizeof(node_t) * n_children);
+   va_list child_list;
+   va_start(child_list, n_children);
+   for (size_t i = 0; i < n_children; i++)
+   {
+    children[i] = va_arg(child_list, node_t*);
+   }
+   va_end(child_list);
+
+  node_t* n = malloc(sizeof(node_t));
+  *n = (node_t) {
+	  .type = type,
+	  .children = children,
+	  .n_children = n_children
+  };
+
+  return n;
+
 }
 
 // Append an element to the given LIST node, returns the list node
@@ -118,6 +137,21 @@ static void node_finalize(node_t* discard)
    * Finally free the memory occupied by the node itself.
    * Only free the memory owned by this node - do not touch its children.
    */
+
+  if (discard == NULL) {return; }
+  switch (discard->type)
+  {
+  case IDENTIFIER:
+    free(discard->data.identifier);
+    break;
+  case STRING_LITERAL:
+    free(discard->data.string_literal);
+    break;
+  default:
+	  break;
+  }
+  free(discard->children);
+  free(discard);
 }
 
 // Recursively frees the memory owned by the given node, and all its children
@@ -132,6 +166,13 @@ static void destroy_subtree(node_t* discard)
    * It's a good idead to destory the children first.
    * Seems like you can use the `node_finalize` function in some way here...
    */
+  if (discard == NULL) { return; }
+
+  for (size_t i = 0; i < discard->n_children; i++)
+  {
+    destroy_subtree(discard->children[i]);
+  }
+  node_finalize(discard);
 }
 
 // Definition of the global string array NODE_TYPE_NAMES
