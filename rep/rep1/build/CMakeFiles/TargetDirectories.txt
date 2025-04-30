@@ -1,0 +1,3 @@
+/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep1/build/CMakeFiles/ps1.dir
+/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep1/build/CMakeFiles/edit_cache.dir
+/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep1/build/CMakeFiles/rebuild_cache.dir

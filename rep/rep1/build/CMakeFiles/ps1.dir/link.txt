@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file=CMakeFiles/ps1.dir/link.d CMakeFiles/ps1.dir/src/driver.c.o -o ps1
