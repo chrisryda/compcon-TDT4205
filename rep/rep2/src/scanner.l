@@ -12,9 +12,11 @@
 %option array
 %option yylineno
 
-WHITESPACE [ \t]
+WHITESPACE [ \t\n\r]
 COMMENT \/\/[^\n]+
 QUOTED \"([^\"\n]|\\\")*\"
+NUMBER [0-9]+
+IDENTIFIER [A-Za-z_][A-Za-z0-9_]*
 
 %%
 {WHITESPACE}+           { /* Eliminate whitespace */ }
@@ -38,6 +40,17 @@ QUOTED \"([^\"\n]|\\\")*\"
  * This is achieved by using the "catch-all" rule at the very bottom of this file.
  */
 
+func                    { return FUNC; }
+print                   { return PRINT; }
+return                  { return RETURN; }
+break                   { return BREAK; }
+if                      { return IF; }
+then                    { return THEN; }
+else                    { return ELSE; }
+while                   { return WHILE; } 
+do                      { return DO; }
+{NUMBER}                { return NUMBER_TOKEN; }
+{IDENTIFIER}            { return IDENTIFIER_TOKEN; }
   /* All other chars get returned as single char tokens */
 .                       { return yytext[0]; }
 %%
