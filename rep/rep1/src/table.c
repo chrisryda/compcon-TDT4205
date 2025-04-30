@@ -33,7 +33,21 @@ void fillTable() {
     table[START]['g'] = 1;
     table[1]['o'] = 2;
     table[2]['\n'] = ACCEPT;
-
+    // Task 2.2: Added support for multiple "go"-statements separated by space
     table[2][' '] = START;
 
+    // Task 2.3: Add support for d(x|y)=<number>
+    table[START]['d'] = 3;
+    table[3]['x'] = 4;
+    table[3]['y'] = 4;
+    table[4]['='] = 5;
+    table[5]['-'] = 6;
+
+    for (char c = '0'; c <= '9'; c++) 
+    {
+        table[5][c] = 6;
+        table[6][c] = 6;
+    }
+    table[6]['\n'] = ACCEPT;
+    table[6][' '] = START;
 }
