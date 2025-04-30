@@ -29,6 +29,14 @@ void fillTable() {
     // If we reach a newline, and are not in the middle of a statement, accept
     table[START]['\n'] = ACCEPT;
 
+    // Task 2.4: Add support for labels of form <number>:
+    for (char c = '0'; c <= '9'; c++) 
+    {
+        table[START][c] = 7;
+        table[7][c] = 7;
+    }
+    table[7][':'] = START;
+
     // Accept the statement "go"
     table[START]['g'] = 1;
     table[1]['o'] = 2;
