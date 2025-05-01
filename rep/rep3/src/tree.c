@@ -412,18 +412,24 @@ static bool remove_unreachable_code(node_t* node)
     // The list of statements in a BLOCK is always the last child node
     node_t* statement_list = node->children[node->n_children - 1];
 
-    /*
-     * TODO 2.5: Implement unreachable code elimination
-     *
-     * A BLOCK node consists of a list of statements.
-     * For each statement S, do a recursive call to remove_unreachable_code( S ).
-     * If the call returns true, that means the statement S is guaranteed to abort the rest of the
-     * block. This can for example be due to a RETURN_STATEMENT or a BREAK_STATEMENT. If that
-     * happens, we know that the rest of the BLOCK is unreachable code. Remove all children of the
-     * statement LIST that come after S by changing n_children. Make sure you clean up all nodes
-     * that become detached from the LIST. Finally, return true, as the BLOCK contains a statement
-     * that interrupts regular execution.
-     */
+     for (size_t i = 0; i < statement_list->n_children; i++)
+     {
+       node_t* child_statement = statement_list->children[i];
+       bool interrupting = remove_unreachable_code(child_statement);
+ 
+       // If we have an interrupting statement, the rest of the statement list should be freed
+       if (interrupting)
+       {
+ 
+         // free all statements that come after i
+         for (size_t j = i + 1; j < statement_list->n_children; j++)
+           destroy_subtree(statement_list->children[j]);
+ 
+         // Truncate the list of statements
+         statement_list->n_children = i + 1;
+         return true;
+       }
+     }
 
     // If we get here, none of the statements in the block are interrupting.
     return false;
