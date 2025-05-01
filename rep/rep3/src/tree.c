@@ -289,7 +289,25 @@ static node_t* constant_fold_if(node_t* node)
    * and then sending the rest of the IF_STATEMENT node to destroy_subtree.
    */
 
-  return node;
+  if (node->children[0]->type != NUMBER_LITERAL) { return node; }
+  bool cond = node->children[0]->data.number_literal;
+
+  node_t* res = NULL;
+
+  if (cond)
+  {
+    res = node->children[1];
+    node->children[1] = NULL;
+  }
+  else if (node->n_children == 3) 
+  { 
+    res = node->children[2];
+    node->children[2] = NULL; 
+  }
+
+  destroy_subtree(node);
+
+  return res;
 }
 
 // If the condition of the given while node is a NUMBER_LITERAL, and it is false (0),
