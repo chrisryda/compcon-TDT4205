@@ -12,8 +12,8 @@ define i32 @ssa_function(i32 %a) {
       br label %ifEnd
     
     ifEnd: ; preds = %ifTrue, %ifFalse
-      %phi.0 = phi i32 [ %sub.0, %ifTrue ], [ %a, %ifFalse ]
-      ret i32 %phi.0
+      %phi.0 = phi i32 [ %sub.0, %ifTrue ], [ %a, %ifFalse ]    // if %ifTrue was executed last, phi.0 = sub.0,
+      ret i32 %phi.0                                            // but if %ifFalse was executed last, phi.0 = a
 }
 */
 
