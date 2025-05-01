@@ -1,0 +1,3 @@
+# Hashes of file build rules.
+26d47602806b276ab74ebee98f4f682f parser.c
+5c1f37e242b0e35c340038ec85b1b8a1 scanner.c
