@@ -182,6 +182,82 @@ static node_t* constant_fold_operator(node_t* node)
    * returns 0 if the strings are identical.
    */
 
+  for (size_t i = 0; i < node->n_children; i++) 
+  {
+    if (node->children[i]->type != NUMBER_LITERAL) { return node; }
+  }
+
+  int64_t res;
+  const char* op = node->data.operator;
+  if (node->n_children == 1) 
+  {
+    int64_t v = node->children[0]->data.number_literal;
+    if (!strcmp(op, "-"))
+    {
+      res = -v;
+    }
+    else if (!strcmp(op, "!"))
+    {
+      res = !v;
+    }
+    else { assert (false && "Uknown unary operator"); }
+  }
+  else if (node->n_children == 2)
+  {
+    int64_t v1 = node->children[0]->data.number_literal;
+    int64_t v2 = node->children[1]->data.number_literal;
+    if (!strcmp(op, "=="))
+    {
+      res = (v1 == v2);
+    }
+    else if (!strcmp(op, "!="))
+    {
+      res = (v1 != v2);
+    }
+    else if (!strcmp(op, "<"))
+    {
+      res = (v1 < v2);
+    }
+    else if (!strcmp(op, "<="))
+    {
+      res = (v1 <= v2);
+    }
+    else if (!strcmp(op, ">"))
+    {
+      res = (v1 > v2);
+    }
+    else if (!strcmp(op, ">="))
+    {
+      res = (v1 >= v2);
+    }
+    else if (!strcmp(op, "+"))
+    {
+      res = (v1 + v2);
+    }
+    else if (!strcmp(op, "-"))
+    {
+      res = (v1 - v2);
+    }
+    else if (!strcmp(op, "*"))
+    {
+      res = (v1 * v2);
+    }
+    else if (!strcmp(op, "/"))
+    {
+      res = (v1 / v2);
+    }
+    else { assert (false && "Uknown binary operator"); }
+  }
+
+  for (size_t i = 0; i < node->n_children; i++) 
+  {
+    destroy_subtree(node->children[i]);
+  }
+
+  node->type = NUMBER_LITERAL;
+  node->data.number_literal = res;
+  node->n_children = 0;
+
   return node;
 }
 
