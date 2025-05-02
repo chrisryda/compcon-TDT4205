@@ -87,6 +87,9 @@ main:
             movq n_cols(%rip), %r8 # Move n_cols to r8
             inc %r8 # Because of 1-indexing
 
+            cmp %r8, %r13
+            je col_loop_end
+
             # TODO 2.G
             # *Ready special registers* for our modulo check
             # Put correct values in all registers
