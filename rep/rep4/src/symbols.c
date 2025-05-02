@@ -264,6 +264,15 @@ static void destroy_symbol_tables(void)
 
   // TIP: Using symbol_table_destroy() goes a long way, but it only cleans up the given table.
   // Try cleaning up all local symbol tables before cleaning up the global one.
+  for (size_t i = 0; i < global_symbols->n_symbols; i++) 
+  {
+		symbol_t *symbol = global_symbols->symbols[i];
+		if (symbol->function_symtable) 
+    {
+			symbol_table_destroy(symbol->function_symtable);
+		}
+	}
+	symbol_table_destroy(global_symbols);
 }
 
 // Declaration of global string list
@@ -286,6 +295,26 @@ static size_t add_string(char* string)
   // Tip: See the realloc function from the standard library
 
   // Return the position the added string gets in the list.
+  size_t index = string_list_len;
+
+	if (!string_list) 
+  {
+		string_list_capacity = 16;
+		string_list = malloc(sizeof(char*) * string_list_capacity);
+	}
+
+	// Resize the list when out of capacity
+	if (index >= string_list_capacity) 
+  {
+		string_list_capacity *= 2;
+		string_list = realloc(string_list, string_list_capacity);
+	}
+
+	// Set the element and update the index
+	string_list[index] = string;
+	string_list_len++;
+
+  return index;
 }
 
 // Prints all strings added to the global string list
@@ -299,4 +328,12 @@ static void print_string_list(void)
 static void destroy_string_list(void)
 {
   // TODO: Called during cleanup, free strings, and the memory used by the string list itself
+  for (size_t i = 0; i < string_list_len; i++) 
+  {
+		free(string_list[i]);
+	}
+	free(string_list);
+	string_list = NULL;
+	string_list_len = 0;
+	string_list_capacity = 0;
 }
