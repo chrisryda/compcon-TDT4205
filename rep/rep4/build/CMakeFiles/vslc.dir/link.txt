@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file=CMakeFiles/vslc.dir/link.d CMakeFiles/vslc.dir/src/vslc.c.o CMakeFiles/vslc.dir/src/tree.c.o CMakeFiles/vslc.dir/src/graphviz_output.c.o CMakeFiles/vslc.dir/src/symbols.c.o CMakeFiles/vslc.dir/src/symbol_table.c.o CMakeFiles/vslc.dir/scanner.c.o CMakeFiles/vslc.dir/parser.c.o -o vslc
