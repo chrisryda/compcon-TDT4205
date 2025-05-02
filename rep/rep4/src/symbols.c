@@ -90,7 +90,7 @@ static void find_globals(void)
     {
       // A global_declaration in VSL is a list, so we iterate over the children
       node_t* global_variable_list = node->children[0];
-      for (size_t j = 0; j < global_variable_list->n_children; i++)
+      for (size_t j = 0; j < global_variable_list->n_children; j++)
       {
         node_t* child = global_variable_list->children[j];
         symbol_t global_symbol = (symbol_t) {
@@ -130,9 +130,9 @@ static void find_globals(void)
       if (symbol_table_insert(global_symbols, function_symbol) == INSERT_COLLISION) { exit(EXIT_FAILURE); }
 
       node_t* parameter_list = node->children[1];
-      for (size_t i = 0; i < parameter_list->n_children; i++)
+      for (size_t j = 0; j < parameter_list->n_children; j++)
       {
-        node_t* param = parameter_list->children[i];
+        node_t* param = parameter_list->children[j];
         symbol_t* param_symbol = malloc(sizeof(symbol_t));
         *param_symbol = (symbol_t) {
           .name = param->data.identifier,
