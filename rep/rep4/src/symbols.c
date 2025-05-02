@@ -83,14 +83,14 @@ static void find_globals(void)
   // If a symbol already exists with the same name, the insertion will return INSERT_COLLISION.
   // Feel free to print an error message and abort using exit(EXIT_FAILURE),
   // but we will not be testing your compiler on invalid VSL.
-  for (int i = 0; i < root->n_children; i++)
+  for (size_t i = 0; i < root->n_children; i++)
   {
     node_t* node = root->children[i];
     if (node->type == GLOBAL_DECLARATION)
     {
       // A global_declaration in VSL is a list, so we iterate over the children
       node_t* global_variable_list = node->children[0];
-      for (int j = 0; j < global_variable_list->n_children; i++)
+      for (size_t j = 0; j < global_variable_list->n_children; i++)
       {
         node_t* child = global_variable_list->children[j];
         symbol_t global_symbol = (symbol_t) {
@@ -130,7 +130,7 @@ static void find_globals(void)
       if (symbol_table_insert(global_symbols, function_symbol) == INSERT_COLLISION) { exit(EXIT_FAILURE); }
 
       node_t* parameter_list = node->children[1];
-      for (int i = 0; i < parameter_list->n_children; i++)
+      for (size_t i = 0; i < parameter_list->n_children; i++)
       {
         node_t* param = parameter_list->children[i];
         symbol_t* param_symbol = malloc(sizeof(symbol_t));
