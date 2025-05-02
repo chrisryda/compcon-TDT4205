@@ -138,15 +138,15 @@ static void find_globals(void)
       for (size_t j = 0; j < param_list->n_children; j++)
       {
         node_t* param = param_list->children[j];
-        symbol_t* param_symbol = malloc(sizeof(symbol_t));
-        *param_symbol = (symbol_t) {
-          .name = param->data.identifier,
-          .type = SYMBOL_PARAMETER,
-          .node = param,
-          .function_symtable = NULL,
-        };
-        insert_result = symbol_table_insert(local_table, param_symbol);
-        if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
+          symbol_t* param_symbol = malloc(sizeof(symbol_t));
+          *param_symbol = (symbol_t) {
+            .name = param->data.identifier,
+            .type = SYMBOL_PARAMETER,
+            .node = param,
+            .function_symtable = NULL,
+          };
+          insert_result = symbol_table_insert(local_table, param_symbol);
+          if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
       }
     }
   }

@@ -170,6 +170,69 @@ static void bind_names(symbol_table_t* local_symbols, node_t* node)
   // a parent scope, or in the global symbol table, that is an error.
   // Feel free to print a nice error message and abort.
   // We will not test your compiler on incorrect VSL.
+  if (node == NULL) { return; }
+
+  symbol_hashmap_t* prev_hashmap;
+  
+  switch (node->type)
+  {
+    case FUNCTION:
+      // Avoid binding the parameters
+      bind_names(local_symbols, node->children[2]);
+      break;
+
+    case BLOCK:
+      // Init new hashmap for the scope of the block
+      prev_hashmap = local_symbols->hashmap;
+      local_symbols->hashmap = symbol_hashmap_init();
+      local_symbols->hashmap->backup = prev_hashmap;
+
+      // If the block is of the form '{' local_declaration_list statement_list '}'
+      // i.e. n_children is >= 2, we iterate over the local variable symbols and
+      // add them to the blocks local table 
+      if (node->n_children >= 2)
+      {
+        node_t* locals_list = node->children[0];
+        for (size_t i = 0; i < locals_list->n_children; i++)
+        {
+          node_t* locals = locals_list->children[i];
+          for (size_t j = 0; j < locals->n_children; j++)
+          {
+            node_t* local = locals->children[j];
+            symbol_t* local_symbol = malloc(sizeof(symbol_t));
+            *local_symbol = (symbol_t) {
+              .name = local->data.identifier,
+              .type = SYMBOL_LOCAL_VAR,
+              .node = local,
+              .function_symtable = NULL,
+            };
+            insert_result_t insert_result = symbol_table_insert(local_symbols, local_symbol);
+            if (insert_result == INSERT_COLLISION) { exit(EXIT_FAILURE); }
+          }
+        }
+      }
+      bind_names(local_symbols, node->children[(node->n_children - 1)]);
+      // Restore the hashmap
+      symbol_hashmap_destroy(local_symbols->hashmap);
+      local_symbols->hashmap = prev_hashmap;
+      break;
+
+    case IDENTIFIER:
+      node->symbol = symbol_hashmap_lookup(local_symbols->hashmap, node->data.identifier);
+      break;
+
+    case STRING_LITERAL:
+      node->data.string_list_index = add_string(node->data.string_literal);
+      node->type = STRING_LIST_REFERENCE;
+      break;
+
+    default:
+      for (size_t i = 0; i < node->n_children; i++)
+      {
+        bind_names(local_symbols, node->children[i]);
+      }
+      break;
+  }
 }
 
 // Prints the given symbol table, with sequence number, symbol names and types.
