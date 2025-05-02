@@ -1,0 +1,3 @@
+/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep5/asl/task/build/CMakeFiles/modulo.dir
+/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep5/asl/task/build/CMakeFiles/edit_cache.dir
+/home/crd/Documents/y5s2/compcon-TDT4205/rep/rep5/asl/task/build/CMakeFiles/rebuild_cache.dir
