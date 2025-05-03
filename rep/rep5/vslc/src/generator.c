@@ -465,11 +465,33 @@ static void generate_print_statement(node_t* statement)
 {
   // TODO: 2.4.4
   // Remember to call safe_printf instead of printf
+  node_t* print_items = statement->children[0];
+  for (size_t i = 0; i < print_items->n_children; i++)
+  {
+    node_t* item = print_items->children[i];
+    if (item->type == STRING_LIST_REFERENCE)
+    {
+      EMIT("leaq strout(%s), %s", RIP, RDI);
+      EMIT("leaq string%zu(%s), %s", (size_t)item->data.string_list_index, RIP, RSI);
+    }
+    else
+    {
+      generate_expression(item);
+      MOVQ(RAX, RSI);
+      EMIT("leaq intout(%s), %s", RIP, RDI);
+    }
+    EMIT("call safe_printf");
+  }
+
+  MOVQ("$'\\n'", RDI);
+  EMIT("call safe_putchar");
 }
 
 static void generate_return_statement(node_t* statement)
 {
   // TODO: 2.4.5 Evaluate the return value, store it in %rax and jump to the function epilogue
+  generate_expression(statement->children[0]);
+  EMIT("jmp .%s.epilogue", current_function->name);
 }
 
 // Recursively generate the given statement node, and all sub-statements.
@@ -481,6 +503,32 @@ static void generate_statement(node_t* node)
   // TODO: 2.4 Generate instructions for statements.
   // The candidates are BLOCK, ASSIGNMENT_STATEMENT, PRINT_STATEMENT, RETURN_STATEMENT,
   // FUNCTION_CALL
+  switch (node->type)
+  {
+  case BLOCK:
+  {
+    // All handling of pushing and popping scopes has already been done
+    // Just generate the statements that make up the statement body, one by one
+    node_t* statement_list = node->children[node->n_children - 1];
+    for (size_t i = 0; i < statement_list->n_children; i++)
+      generate_statement(statement_list->children[i]);
+    break;
+  }
+  case ASSIGNMENT_STATEMENT:
+    generate_assignment_statement(node);
+    break;
+  case PRINT_STATEMENT:
+    generate_print_statement(node);
+    break;
+  case RETURN_STATEMENT:
+    generate_return_statement(node);
+    break;
+  case FUNCTION_CALL:
+    generate_function_call(node);
+    break;
+  default:
+    assert(false && "Unknown statement type");
+  }
 }
 
 static void generate_safe_printf(void)
@@ -493,6 +541,22 @@ static void generate_safe_printf(void)
   // A stack pointer that is not 16-byte aligned, will be moved down to a 16-byte boundary
   ANDQ("$-16", RSP);
   EMIT("call printf");
+  // Cleanup the stack back to how it was
+  MOVQ(RBP, RSP);
+  POPQ(RBP);
+  RET;
+}
+
+static void generate_safe_putchar(void)
+{
+  LABEL("safe_putchar");
+
+  PUSHQ(RBP);
+  MOVQ(RSP, RBP);
+  // This is a bitmask that abuses how negative numbers work, to clear the last 4 bits
+  // A stack pointer that is not 16-byte aligned, will be moved down to a 16-byte boundary
+  ANDQ("$-16", RSP);
+  EMIT("call putchar");
   // Cleanup the stack back to how it was
   MOVQ(RBP, RSP);
   POPQ(RBP);
@@ -566,6 +630,7 @@ skip_args:
   EMIT("call exit"); // Exit with return code 1
 
   generate_safe_printf();
+  generate_safe_putchar();
 
   // Declares global symbols we use or emit, such as main, printf and putchar
   DIRECTIVE("%s", ASM_DECLARE_SYMBOLS);
