@@ -108,10 +108,37 @@ static void generate_function(symbol_t* function)
 
   // TODO: 2.3.1 Do the prologue, including call frame building and parameter pushing
   // Tip: use the definitions REGISTER_PARAMS and NUM_REGISTER_PARAMS at the top of this file
+  LABEL(".%s", function->name);
+  current_function = function;
+
+  PUSHQ(RBP);
+  MOVQ(RSP, RBP);
+
+  // Push number of params (up to 6) to the stack, freeing the registers
+  size_t n_params = FUNC_PARAM_COUNT(function);
+  for (size_t i = 0; i < n_params && i < NUM_REGISTER_PARAMS; i++)
+  {
+    PUSHQ(REGISTER_PARAMS[i]);
+  }
+
+  // Making room for the functions local variables
+  for (size_t i = 0; i < function->function_symtable->n_symbols; i++) 
+  {
+    if (function->function_symtable->symbols[i]->type == SYMBOL_LOCAL_VAR) 
+    {
+      PUSHQ("$0");
+    }
+  }
 
   // TODO: 2.4 the function body can be sent to generate_statement()
+  generate_statement(function->node->children[2]);
 
   // TODO: 2.3.2
+  LABEL(".%s.epilogue", function->name);
+  // leaveq is written out manually, to increase clarity of what happens
+  MOVQ(RBP, RSP);
+  POPQ(RBP);
+  RET;
 }
 
 // Generates code for a function call, which can either be a statement or an expression
