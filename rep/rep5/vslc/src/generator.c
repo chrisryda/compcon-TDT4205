@@ -39,6 +39,23 @@ void generate_program(void)
   // and passed as the (argc, argv)-pair, we need to make a wrapper for our entry function.
   // This wrapper handles string -> int64_t conversion, and is already implemented.
   // call generate_main ( <entry point function symbol> );
+  symbol_t* first_function = NULL;
+  for (size_t i = 0; i < global_symbols->n_symbols; i++)
+  {
+    symbol_t* symbol = global_symbols->symbols[i];
+    if (symbol->type != SYMBOL_FUNCTION)
+      continue;
+    if (!first_function)
+      first_function = symbol;
+    generate_function(symbol);
+  }
+
+  if (first_function == NULL)
+  {
+    fprintf(stderr, "error: program contained no functions\n");
+    exit(EXIT_FAILURE);
+  }
+  generate_main(first_function);
 }
 
 // Prints one .asciz entry for each string in the global string_list
@@ -144,7 +161,129 @@ static void generate_function(symbol_t* function)
 // Generates code for a function call, which can either be a statement or an expression
 static void generate_function_call(node_t* call)
 {
-  // TODO 2.4.3
+  symbol_t* symbol = call->children[0]->symbol;
+  if (symbol->type != SYMBOL_FUNCTION)
+  {
+    fprintf(stderr, "error: '%s' is not a function\n", symbol->name);
+    exit(EXIT_FAILURE);
+  }
+
+  node_t* argument_list = call->children[1];
+
+  size_t parameter_count = FUNC_PARAM_COUNT(symbol);
+  if (parameter_count != argument_list->n_children)
+  {
+    fprintf
+    (
+      stderr,
+      "error: function '%s' expects '%zu' arguments, but '%zu' were given\n",
+      symbol->name,
+      parameter_count,
+      argument_list->n_children
+    );
+    exit(EXIT_FAILURE);
+  }
+
+  // We evaluate all parameters from right to left, pushing them to the stack
+  for (int i = parameter_count - 1; i >= 0; i--)
+  {
+    generate_expression(argument_list->children[i]);
+    PUSHQ(RAX);
+  }
+
+  // Up to 6 parameters should be passed through registers instead. Pop them off the stack
+  for (size_t i = 0; i < parameter_count && i < NUM_REGISTER_PARAMS; i++)
+  {
+    POPQ(REGISTER_PARAMS[i]);
+  }
+
+  EMIT("call .%s", symbol->name);
+
+  // Now pop away any stack passed parameters still left on the stack, by moving %rsp upwards
+  if (parameter_count > NUM_REGISTER_PARAMS)
+  {
+    EMIT("addq $%zu, %s", (parameter_count - NUM_REGISTER_PARAMS) * 8, RSP);
+  }
+}
+
+// Returns a string for accessing the quadword referenced by node
+static const char* generate_variable_access(node_t* node)
+{
+  static char result[100];
+
+  assert(node->type == IDENTIFIER);
+
+  symbol_t* symbol = node->symbol;
+  switch (symbol->type)
+  {
+  case SYMBOL_GLOBAL_VAR:
+    snprintf(result, sizeof(result), ".%s(%s)", symbol->name, RIP);
+    return result;
+  case SYMBOL_LOCAL_VAR:
+  {
+    // If we have more than 6 parameters, subtract away the hole in the sequence numbers
+    int call_frame_offset = symbol->sequence_number;
+    if (FUNC_PARAM_COUNT(current_function) > NUM_REGISTER_PARAMS)
+      call_frame_offset -= FUNC_PARAM_COUNT(current_function) - NUM_REGISTER_PARAMS;
+    // The stack grows down, in multiples of 8, and sequence number 0 corresponds to -8
+    call_frame_offset = (-call_frame_offset - 1) * 8;
+
+    snprintf(result, sizeof(result), "%d(%s)", call_frame_offset, RBP);
+    return result;
+  }
+  case SYMBOL_PARAMETER:
+  {
+    int call_frame_offset;
+    // Handle the first 6 parameters differently
+    if (symbol->sequence_number < NUM_REGISTER_PARAMS)
+      // Move along down the stack, with parameter 0 at position -8(%rbp)
+      call_frame_offset = -(symbol->sequence_number + 1) * 8;
+    else
+      // Parameter 6 is at 16(%rbp), with further parameters moving up from there
+      call_frame_offset = 16 + (symbol->sequence_number - NUM_REGISTER_PARAMS) * 8;
+
+    snprintf(result, sizeof(result), "%d(%s)", call_frame_offset, RBP);
+    return result;
+  }
+  case SYMBOL_FUNCTION:
+    fprintf(stderr, "error: symbol '%s' is a function, not a variable\n", symbol->name);
+    exit(EXIT_FAILURE);
+  case SYMBOL_GLOBAL_ARRAY:
+    fprintf(stderr, "error: symbol '%s' is an array, not a variable\n", symbol->name);
+    exit(EXIT_FAILURE);
+  default:
+    assert(false && "Unknown variable symbol type");
+  }
+}
+
+/**
+ * Takes in an ARRAY_INDEXING node, such as array[x]
+ * The function emits code to evaluate x, which may clobber all registers.
+ * Once x is evaluated, the address of array[x] is calculated, and stored in the RCX register.
+ * The return value is the string "(%rcx)", the assembly for using RCX as an address.
+ */
+static const char* generate_array_access(node_t* node)
+{
+  assert(node->type == ARRAY_INDEXING);
+
+  symbol_t* symbol = node->children[0]->symbol;
+  if (symbol->type != SYMBOL_GLOBAL_ARRAY)
+  {
+    fprintf(stderr, "error: symbol '%s' is not an array\n", symbol->name);
+    exit(EXIT_FAILURE);
+  }
+
+  // Calculate the index of the array into %rax
+  generate_expression(node->children[1]);
+
+  // Place the base of the array into %rcx
+  EMIT("leaq .%s(%s), %s", symbol->name, RIP, RCX);
+
+  // Place the exact position of the element we wish to access, into %rcx
+  EMIT("leaq (%s, %s, 8), %s", RCX, RAX, RCX);
+
+  // Now, the address of the element is stored at %rcx, so just use MEM() to reference it
+  return MEM(RCX);
 }
 
 // Generates code to evaluate the expression, and place the result in %rax
@@ -152,6 +291,144 @@ static void generate_expression(node_t* expression)
 {
   // TODO: 2.4.1 Generate code for evaluating the given expression.
   // (The candidates are NUMBER_LITERAL, IDENTIFIER, ARRAY_INDEXING, OPERATOR and FUNCTION_CALL)
+  switch (expression->type)
+  {
+    case NUMBER_LITERAL:
+      // Move value to %rax
+      EMIT("movq $%ld, %s", expression->data.number_literal, RAX);
+      break;
+    case IDENTIFIER:
+      // Load var and put it in %rax
+      MOVQ(generate_variable_access(expression), RAX);
+      break;
+    case ARRAY_INDEXING:
+      // Load the value pointed to by array[idx], and put the result in RAX
+      MOVQ(generate_array_access(expression), RAX);
+      break;
+    case OPERATOR:
+    {
+      const char* op = expression->data.operator;
+      if (strcmp(op, "+") == 0)
+      {
+        generate_expression(expression->children[0]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[1]);
+        POPQ(RCX);
+        ADDQ(RCX, RAX);
+      }
+      else if (strcmp(op, "-") == 0)
+      {
+        if (expression->n_children == 1)
+        {
+          // Unary minus
+          generate_expression(expression->children[0]);
+          NEGQ(RAX);
+        }
+        else
+        {
+          // Binary minus. Evaluate RHS first, to get the result in RAX easier
+          generate_expression(expression->children[1]);
+          PUSHQ(RAX);
+          generate_expression(expression->children[0]);
+          POPQ(RCX);
+          SUBQ(RCX, RAX);
+        }
+      }
+      else if (strcmp(op, "*") == 0)
+      {
+        // Multiplication does not need to do sign extend
+        generate_expression(expression->children[0]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[1]);
+        POPQ(RCX);
+        IMULQ(RCX, RAX);
+      }
+      else if (strcmp(op, "/") == 0)
+      {
+        generate_expression(expression->children[1]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[0]);
+        CQO; // Sign extend RAX -> RDX:RAX
+        POPQ(RCX);
+        IDIVQ(RCX); // Didivde RDX:RAX by RCX, placing the result in RAX
+      }
+      else if (strcmp(op, "==") == 0)
+      {
+        generate_expression(expression->children[0]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[1]);
+        POPQ(RCX);
+        CMPQ(RAX, RCX);
+        SETE(AL);        // Store lhs == rhs into %al
+        MOVZBQ(AL, RAX); // Zero extend to all of %rax
+      }
+      else if (strcmp(op, "!=") == 0)
+      {
+        generate_expression(expression->children[0]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[1]);
+        POPQ(RCX);
+        CMPQ(RAX, RCX);
+        SETNE(AL);       // Store lhs != rhs into %al
+        MOVZBQ(AL, RAX); // Zero extend to all of %rax
+      }
+      else if (strcmp(op, "<") == 0)
+      {
+        generate_expression(expression->children[0]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[1]);
+        POPQ(RCX);
+        CMPQ(RAX, RCX);
+        SETL(AL);        // Store lhs < rhs into %al
+        MOVZBQ(AL, RAX); // Zero extend to all of %rax
+      }
+      else if (strcmp(op, "<=") == 0)
+      {
+        generate_expression(expression->children[0]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[1]);
+        POPQ(RCX);
+        CMPQ(RAX, RCX);
+        SETLE(AL);       // Store lhs <= rhs into %al
+        MOVZBQ(AL, RAX); // Zero extend to all of %rax
+      }
+      else if (strcmp(op, ">") == 0)
+      {
+        generate_expression(expression->children[0]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[1]);
+        POPQ(RCX);
+        CMPQ(RAX, RCX);
+        SETG(AL);        // Store lhs > rhs into %al
+        MOVZBQ(AL, RAX); // Zero extend to all of %rax
+      }
+      else if (strcmp(op, ">=") == 0)
+      {
+        generate_expression(expression->children[0]);
+        PUSHQ(RAX);
+        generate_expression(expression->children[1]);
+        POPQ(RCX);
+        CMPQ(RAX, RCX);
+        SETGE(AL);       // Store lhs >= rhs into %al
+        MOVZBQ(AL, RAX); // Zero extend to all of %rax
+      }
+      else if (strcmp(op, "!") == 0)
+      {
+        generate_expression(expression->children[0]);
+        CMPQ("$0", RAX);
+        SETE(AL);        // Store %rax == 0 into %al
+        MOVZBQ(AL, RAX); // Zero extend to all of %rax
+      }
+      else
+        assert(false && "Unknown expression operation");
+      break;
+    }
+    case FUNCTION_CALL:
+      generate_function_call(expression);
+      break;
+    default:
+      assert(false && "Unknown expression type");
+  }
 }
 
 static void generate_assignment_statement(node_t* statement)
@@ -161,6 +438,27 @@ static void generate_assignment_statement(node_t* statement)
   // Use the IDENTIFIER's symbol to find out what kind of symbol you are assigning to.
   // The left hand side of an assignment statement may also be an ARRAY_INDEXING node.
   // In that case, you must also emit code for evaluating the index being stored to
+  node_t* dest = statement->children[0];
+  node_t* expression = statement->children[1];
+
+  // First the right hand side of the assignment is evaluated
+  generate_expression(expression);
+
+  if (dest->type == IDENTIFIER)
+  {
+    // Store rax into the memory location corresponding to the variable
+    MOVQ(RAX, generate_variable_access(dest));
+  } 
+  else
+  {
+    assert(dest->type == ARRAY_INDEXING);
+    // Store rax until the final address of the array element is found,
+    // since array index calculation can potentially modify all registers
+    PUSHQ(RAX);
+    const char* dest_mem = generate_array_access(dest);
+    POPQ(RAX);
+    MOVQ(RAX, dest_mem);
+  }
 }
 
 static void generate_print_statement(node_t* statement)
