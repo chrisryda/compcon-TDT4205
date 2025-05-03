@@ -78,6 +78,24 @@ static void generate_global_variables(void)
 
   // As an example, to set aside 16 bytes and label it .myBytes, write:
   // DIRECTIVE(".myBytes: .zero 16")
+  for (size_t i = 0; i < global_symbols->n_symbols; i++)
+  {
+    symbol_t* symbol = global_symbols->symbols[i];
+    if (symbol->type == SYMBOL_GLOBAL_VAR)
+    {
+      EMIT(".%s: \t.zero 8", symbol->name);
+    }
+    else if (symbol->type == SYMBOL_GLOBAL_ARRAY)
+    {
+      if (symbol->node->children[1]->type != NUMBER_LITERAL) 
+      { 
+        fprintf(stderr, "error: length of array '%s' is not compile time known", symbol->name);
+        exit(EXIT_FAILURE);
+      }
+      int64_t len = symbol->node->children[1]->data.number_literal;
+      EMIT(".%s: \t.zero %ld", symbol->name, (8 * len));
+    }
+  }
 }
 
 // Global variable used to make the functon currently being generated accessible from anywhere
